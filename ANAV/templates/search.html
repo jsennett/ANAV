@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>ANAV</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 90%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: #333;
+      }
+
+      li {
+          float: left;
+      }
+      li a {
+          display: block;
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+      }
+      li a:hover {
+          background-color: #111;
+      }
+
+
+    </style>
+  </head>
+
+
+  <img src="/static/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
+
+
+  <h3>ANAV: A* Navigation for cyclists with tired legs</h1>
+
+
+  <body>
+    <form method="post">
+      <label for="CurPos">Current Position</label>
+      <input type="text" name="CurPos" id="CurPos" value = '{{CurPostext}}' required>
+      <label for="Destination">Destination</label>
+      <input type="text" name="Destination" id="Destination"  value = '{{Destinationtext}}' required>
+      <input type="submit" value="Search Path">
+    </form>
+
+    <div id="map"></div>
+    <script>
+      // This example creates a 2-pixel-wide red polyline showing the path of
+      // the first trans-Pacific flight between Oakland, CA, and Brisbane,
+      // Australia which was made by Charles Kingsford Smith.
+
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: {lat: 42.397505, lng: -72.5218360757396},
+          mapTypeId: 'terrain'
+        });
+
+
+        var num = parseInt('{{length}}'); 
+        var flightPlanCoordinates = [
+        {% for point in route %}
+          {lat: {{point[0]}}, lng: {{point[1]}}},
+        {% endfor %}
+        ];
+        
+        var flightPath = new google.maps.Polyline({
+          path: flightPlanCoordinates,
+          geodesic: true,
+          strokeColor: '#FF0000',
+          strokeOpacity: 1.0,
+          strokeWeight: 2
+        });
+
+        flightPath.setMap(map);
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-Kk-3VfS7utO30Z1_XsSOXRwT6g745NQ&callback=initMap">
+    </script>
+  </body>
+
+
+  <ul>
+    <li><a class="active" href="index.html">Navigation</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul>
+
+
+</html>
