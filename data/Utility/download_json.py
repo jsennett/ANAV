@@ -7,7 +7,7 @@ from OSMPythonTools.overpass import overpassQueryBuilder, Overpass
 """
 Data Collection of nodes for a given area.
 Functions:
-Downloads Data using overpass api 
+Downloads Data using overpass api included in the OSMPythonTools module
 Create adjacency list (Graph)
 Save data to file to help resources when reloading app
 """
@@ -19,10 +19,19 @@ class NodeCollector:
         self.destination = [input_city.capitalize(), input_state.capitalize()]
         self.nominatim = Nominatim()
         self.overpass = Overpass()
-        self.nodes = None
-        self.highways = None
+        self.nodes = {}
+        self.highways = {}
         self.adjacent_list = {}
-        self.filtered_list = {}
+        self.elevation_query_list = {}
+
+    def get_nodes(self):
+        return self.nodes
+
+    def get_highways(self):
+        return self.highways
+
+    def get_adjacency_list(self):
+        return self.adjacent_list
 
     """ 
     Download OSM <way> and <node> elements from given city, state 
@@ -55,14 +64,21 @@ class NodeCollector:
         queried_nodes = [element for element in elements
                          if (element.get('type') == 'node')]
 
+        # Populates the node list (Nodes actually within query area)
+        for element in queried_nodes:
+            node_id = element.get('id')
+            node_lat = element.get('lat')
+            node_lon = element.get('lon')
+            self.nodes[node_id] = (node_lat, node_lon)
+
         # part 2 of the query result modified to include roads that are accessible to bike riders
+        # https://wiki.openstreetmap.org/wiki/Key:highway
         queried_highways = [element for element in elements
                             if (element.get('type') == 'way') and (element.get('tags')) and (
                                 element.get('tags').get('highway')
-                                in ['service', 'tertiary', 'residential', 'secondary', 'cycleway'] or element.get(
-                                    'tags').get('route') == 'bicycle')]
+                                in ['service', 'tertiary', 'residential', 'secondary', 'cycleway', 'trunk', 'primary']
+                                or element.get('tags').get('route') == 'bicycle')]
 
-        self.nodes = queried_nodes
         self.highways = queried_highways
 
     """
@@ -190,20 +206,12 @@ class NodeCollector:
     # TODO: fill missing information with a place holder value (Read Above)
     def download_elevation_info(self, node_list, key):
         # creates dictionary of nodes containing information that will later be used for elevation collection
-        unfiltered_node_list = {}
-        filtered_node_list = {}
-
-        # Populates the filtered node list (Nodes actually within query area)
-        for element in self.nodes:
-            node_id = element.get('id')
-            node_lat = element.get('lat')
-            node_lon = element.get('lon')
-            unfiltered_node_list[node_id] = (node_lat, node_lon)
+        query_list = {}
 
         for node_id in self.adjacent_list:
-            filtered_node_list[node_id] = unfiltered_node_list.get(node_id)
+            query_list[node_id] = self.nodes.get(node_id)
 
-        self.filtered_list = filtered_node_list
+        self.elevation_query_list = query_list
 
         # Get elevation for every node
         api_key = key
@@ -221,4 +229,42 @@ class NodeCollector:
 
 
 if __name__ == '__main__':
-    pass
+    # city = input("City: ")
+    # state = input("State: ")
+    city = "Amherst"
+    state = "Massachusetts"
+    collector = NodeCollector(city, state)
+
+    # Downloads the query data of given city and state and save it in memory to node and highway variables
+    collector.download_query_data()
+    nodes = collector.get_nodes()
+    # print(nodes)
+    highways = collector.get_highways()
+    # print(highways)
+
+    # create the adjacency list
+    collector.create_adjacency_list()  # creates the adjacency list from the highways data
+    adj_list = collector.get_adjacency_list()
+
+    # Prints first 100 nodes in the adjacency list used to represent the graph.
+    # nodes are represent as node IDs
+    counter = 0
+    for node in adj_list:
+        print("Node: " + str(node), "Neighbors: " + str(adj_list[node]))
+        counter += 1
+        if counter >= 100:
+            break
+
+    print()
+
+    # gets information for the first 100 nodes in the adj list
+    counter = 0
+    for node in adj_list:
+        print("Node: " + str(node), "Information: " + str(nodes.get(node)))
+        counter += 1
+        if counter >= 100:
+            break
+
+
+
+
