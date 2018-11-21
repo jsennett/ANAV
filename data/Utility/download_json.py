@@ -1,5 +1,5 @@
 import simplejson
-import urllib
+import urllib.request
 import csv
 from OSMPythonTools.nominatim import Nominatim
 from OSMPythonTools.overpass import overpassQueryBuilder, Overpass
@@ -192,78 +192,78 @@ class NodeCollector:
             csv_nodes.append([id, lat, lon])
 
         with open("nodes.csv", 'w+') as f:
-            csvWriter = csv.writer(f, delimiter=',')
-            csvWriter.writerows(csv_nodes)
+            csv_writer = csv.writer(f, delimiter=',')
+            csv_writer.writerows(csv_nodes)
 
     """
-    -------------------------------------- Resource Demanding ----------------------------------------------------------
     Collects elevation info for all nodes in query area using google cloud platform elevation API 
-    You may be wondering 'why there are 2 dictionaries labeled unfiltered node list and filtered node list!?'
-    Essentially the highways containing the collection of nodes include nodes outside of the queried area that we do not 
-    have information on (lat, lon) so we must filter them out and fill missing information with a place holder value.
-    Download information for all nodes in this filtered list and write to a file comma delimited (nodeID, elevation)
+    input: [(id, lat, lon), (id, lat, lon), … ]
+    output: [(id, lat, lon, elev), (id, lat, lon, elev), … ]
     """
-    # TODO: fill missing information with a place holder value (Read Above)
-    def download_elevation_info(self, node_list, key):
-        # creates dictionary of nodes containing information that will later be used for elevation collection
-        query_list = {}
+    @staticmethod
+    def download_elevation_info(node_list, api_key):
+        service_url = 'https://maps.googleapis.com/maps/api/elevation/json?locations='
+        url_tail = "&key=" + api_key
 
-        for node_id in self.adjacent_list:
-            query_list[node_id] = self.nodes.get(node_id)
+        # formats block into a string so it can be queried easily
+        # to the parsed blocks list
+        block = []
 
-        self.elevation_query_list = query_list
+        for single_node in node_list:
+            block.append(single_node[1] + "," + single_node[2])
 
-        # Get elevation for every node
-        api_key = key
-        with open('nodeElevations.txt', 'a+') as f:
-            for node in node_list:
-                if node_list.get(node) is not None:
-                    lat = node_list.get(node)[0]
-                    lon = node_list.get(node)[1]
-                    url_builder = 'https://maps.googleapis.com/maps/api/elevation/json?locations=' + str(lat) + "," + \
-                                  str(lon) + '&key=' + api_key
-                    response = simplejson.load(urllib.request.urlopen(url_builder))
+        parsed_block = '|'.join(block)
 
-                    for result_set in response['results']:
-                        f.write(str(node) + ',' + str(result_set['elevation']) + '\n')
+        # queries elevation api and returns query_results
+        query_results = []
+        current_node_index = 0
+
+        query = service_url + parsed_block + url_tail
+        response = simplejson.load(urllib.request.urlopen(query))
+
+        for result_set in response['results']:
+            result = (node_list[current_node_index][0], node_list[current_node_index][1],
+                      node_list[current_node_index][2], result_set['elevation'])
+            query_results.append(result)
+            current_node_index += 1
+        # print(node_list)  # input
+        # print(query_results)  # output
+        return query_results
 
 
 if __name__ == '__main__':
+
     # city = input("City: ")
     # state = input("State: ")
     city = "Amherst"
     state = "Massachusetts"
     collector = NodeCollector(city, state)
 
-    # Downloads the query data of given city and state and save it in memory to node and highway variables
-    collector.download_query_data()
-    nodes = collector.get_nodes()
-    # print(nodes)
-    highways = collector.get_highways()
-    # print(highways)
+    limit = 0
+    node_list = []
 
-    # create the adjacency list
-    collector.create_adjacency_list()  # creates the adjacency list from the highways data
-    adj_list = collector.get_adjacency_list()
+    with open('../nodes.csv', 'r') as f:
+        for line in f:
+            split_line = f.readline().strip('\n').split(',')
+            node = (split_line[0], split_line[1], split_line[2])
+            node_list.append(node)
+            limit += 1
 
-    # Prints first 100 nodes in the adjacency list used to represent the graph.
-    # nodes are represent as node IDs
-    counter = 0
-    for node in adj_list:
-        print("Node: " + str(node), "Neighbors: " + str(adj_list[node]))
-        counter += 1
-        if counter >= 100:
-            break
+            if limit == 320:
+                break
 
-    print()
+    with open('../api_key.txt', 'r') as key:
+        api_key = key.readline()
 
-    # gets information for the first 100 nodes in the adj list
-    counter = 0
-    for node in adj_list:
-        print("Node: " + str(node), "Information: " + str(nodes.get(node)))
-        counter += 1
-        if counter >= 100:
-            break
+    node_input = node_list
+    output = collector.download_elevation_info(node_list, api_key)
+
+    print(node_input)
+    print(output)
+
+
+
+
 
 
 
