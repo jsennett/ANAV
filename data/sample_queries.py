@@ -1,9 +1,9 @@
 import time
-import sqlite3
+import pymysql
 
 def query_nodes_in_rectangle(db):
 
-    conn = sqlite3.connect(db)
+    conn = pymysql.connect(db)
     c = conn.cursor()
 
     c.execute("SELECT * FROM nodes WHERE " +
@@ -20,11 +20,11 @@ def query_nodes_in_rectangle(db):
 
 def index_node_table(db):
 
-    conn = sqlite3.connect(db)
+    conn = pymysql.connect(db)
     c = conn.cursor()
 
-    # c.execute("CREATE INDEX lat_idx ON nodes(lat)")
-    # c.execute("CREATE INDEX lon_idx ON nodes(lon)")
+    c.execute("CREATE INDEX lat_idx ON nodes(lat)")
+    c.execute("CREATE INDEX lon_idx ON nodes(lon)")
     c.execute("CREATE INDEX lat_lon_idx ON nodes(lat, lon)")
     c.execute("CREATE INDEX lon_lat_idx ON nodes(lon, lat)")
     conn.commit()
@@ -36,7 +36,7 @@ def index_node_table(db):
 def sample_table(table, limit, db, filter=''):
     """ Get some rows from a table; useful for exploring and debugging. """
     # Connect
-    conn = sqlite3.connect(db)
+    conn = pymysql.connect(db)
     c = conn.cursor()
 
     # Query
@@ -52,7 +52,7 @@ def sample_table(table, limit, db, filter=''):
 def count_rows(table, db, filter=''):
     """ Count rows in a table; useful for exploring and debugging. """
     # Connect
-    conn = sqlite3.connect(db)
+    conn = pymysql.connect(db)
     c = conn.cursor()
 
     # Query

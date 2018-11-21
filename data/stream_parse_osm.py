@@ -1,25 +1,31 @@
 import xml.etree.ElementTree as etree
 import json
-import sqlite3
+import pymysql
 
 
-def parse_nodes(filename, db, drop=False):
+def parse_nodes(filename, credentials, debug=False):
     """ Parse <node> elements in an OSM XML file, updating a database
     with the 'node' rows contained within.
     """
-    conn = sqlite3.connect(db)
+    conn = pymysql.connect(**credentials)
     c = conn.cursor()
 
-    # Drop table if it already exists
-    if drop:
-        c.execute('DROP TABLE nodes') # comment this out if nodes already exists
-
     # Set up nodes table
-    c.execute("PRAGMA cache_size=-8000")
-    c.execute('CREATE TABLE nodes (id int,  lat real, lon real)')
+    c.execute('DROP TABLE IF EXISTS nodes') # comment this out if nodes already exists
+    c.execute(
+        """
+        CREATE TABLE nodes
+        (id BIGINT NOT NULL,
+        lat real NOT NULL,
+        lon real NOT NULL,
+        PRIMARY KEY (id));
+        """
+    )
 
+    # Initial values
     nodes = []
     lines_read = 0
+    nodes_found = 0
 
     # Parse node elements
     for event, elem in etree.iterparse(filename):
@@ -30,20 +36,24 @@ def parse_nodes(filename, db, drop=False):
 
             if all([val is not None for val in [node_id, lat, lon]]):
                 nodes.append((int(node_id), float(lat), float(lon)))
+                nodes_found += 1
         lines_read += 1
 
         # Every 1 million rows, insert row batch into table
         if lines_read % 10**6 == 0:
             print(lines_read, 'lines read.')
             print('example node:', nodes[0])
-
-            c.executemany('INSERT INTO nodes VALUES (?,?,?)', nodes)
+            if debug: print(nodes)
+            c.executemany('INSERT INTO nodes VALUES (%s,%s,%s)', nodes)
             conn.commit()
             nodes = []
 
         # Once we reach the <way> elements, we are done parsing nodes
+        # Commit any remaining nodes, then exit.
         if elem.tag=='way':
-            print('Done:', i)
+            c.executemany('INSERT INTO nodes VALUES (%s,%s,%s)', nodes)
+            conn.commit()
+            print('Done')
             c.close()
             conn.close()
             return
@@ -51,27 +61,40 @@ def parse_nodes(filename, db, drop=False):
         # clear elem to avoid running out of memory
         elem.clear()
 
-    print('Done')
+    # Ensure we close our connection, in case we do not find a <way> tag
     c.close()
     conn.close()
     return
 
 
-def parse_ways(filename, db, drop=False, debug=False):
+def parse_ways(filename, credentials, debug=False):
     """ Parse <way> elements in an OSM XML file, updating a database
     with the 'way' and 'edge' rows contained within.
     """
-    conn = sqlite3.connect(db)
+    conn = pymysql.connect(**credentials)
     c = conn.cursor()
 
     # Set up table
-    if drop:
-        c.execute('DROP TABLE edges') # comment this out if nodes already exists
-        c.execute('DROP TABLE ways') # comment this out if nodes already exists
+    c.execute('DROP TABLE IF EXISTS edges') # comment this out if nodes already exists
+    c.execute('DROP TABLE IF EXISTS ways') # comment this out if nodes already exists
 
-    c.execute("PRAGMA cache_size=-8000")
-    c.execute('CREATE TABLE edges (start_node_id int,  end_node_id int, way_id int)')
-    c.execute('CREATE TABLE ways (id int, highway text, bicycle text, cycleway text)')
+    c.execute("""
+                CREATE TABLE edges (
+                    start_node_id BIGINT,
+                    end_node_id BIGINT,
+                    way_id BIGINT
+                    )
+              """
+              )
+    c.execute("""
+                CREATE TABLE ways (
+                    id BIGINT,
+                    highway text,
+                    bicycle text,
+                    cycleway text
+                    )
+              """
+              )
 
     lines_read = 0
     ways_found = 0
@@ -116,12 +139,12 @@ def parse_ways(filename, db, drop=False, debug=False):
             # A way row will contain the road characteristics
             way_row = format_way(way)
             if debug: print(way_row)
-            c.execute('INSERT INTO ways VALUES (?,?,?,?)', way_row)
+            c.execute('INSERT INTO ways VALUES (%s,%s,%s,%s)', way_row)
 
             # Edge rows will contain rows for each pair of adjacent nodes
             edge_rows = format_edges(way)
             if debug: print(edge_rows)
-            c.executemany('INSERT INTO edges VALUES (?,?,?)', edge_rows)
+            c.executemany('INSERT INTO edges VALUES (%s,%s,%s)', edge_rows)
 
             # Reset stream parsing values
             ways_found += 1
@@ -150,9 +173,9 @@ def format_way(way):
     # (id int, highway text, bicycle text, cycleway text)
     return (
         int(way['id']),
+        str(way['highway']),
         str(way['bicycle']),
-        str(way['cycleway']),
-        str(way['highway'])
+        str(way['cycleway'])
     )
 
 def format_edges(way):
@@ -179,19 +202,28 @@ def format_edges(way):
 
 
 def parse_sample_file():
-    # Parse nodes and rows from sample file
+    # Parse nodes, ways, and edges from sample file
     sample = '/Users/jsennett/Downloads/map.osm'
-    parse_nodes(sample, 'sample.db', drop=True, debug=True)
-    parse_ways(sample, 'sample.db', drop=True, debug=False)
+    parse_nodes(sample, credentials, debug=True)
+    parse_ways(sample, credentials, debug=True)
 
 
 def parse_massachusetts():
-    # Parse nodes and rows from massachusetts
+    # Parse nodes, ways, and edges from massachusetts
     mass = '/Users/jsennett/Downloads/massachusetts-latest.osm'
-    parse_nodes(mass, 'mass.db', drop=True, debug=False)
-    parse_ways(mass, 'mass.db', drop=True, debug=False)
+    parse_nodes(mass, credentials, debug=False)
+    parse_ways(mass, credentials, debug=False)
 
 
 if __name__ == '__main__':
-    # Parse mass file, creating the 'mass.db' sqlite database file
+    # Set credentials for MySQL connection
+    import os
+    credentials = {
+        'host': 'localhost',
+        'user': 'root',
+        'password': os.environ['MYSQL_PASSWORD'],
+        'database': 'Anav'
+    }
+
+    # Parse mass file, creating MySQL database tables
     parse_massachusetts()
