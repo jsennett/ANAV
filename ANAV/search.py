@@ -20,7 +20,7 @@ def search():
 		error = None
 
 		if CurPos is None:
-			error = 'Current Pisition is required.'
+			error = 'Current Position is required.'
 		elif Destination is None:
 			error = 'Destination is required.'
 		else:

@@ -57,7 +57,7 @@ class Graph:
         self.adjacencyList[A_name].append((B_name, cost_to_B))
 
 
-    def dijkstra_path(self, A, B, use_a_star=True, debug=False):
+    def dijkstra_path(self, A, B, DisPriority, ElePriority, BLPriority, HWPriority, use_a_star=True, debug=False):
         """ Return the shortest path from A to B using Dijkstra algo """
 
         if debug: print("nodes:", self.nodes)
@@ -145,7 +145,7 @@ def heuristic(v, u):
 
 
 
-def optimize(lat1, lon1, lat2, lon2):
+def optimize(lat1, lon1, lat2, lon2, DisPriority=1, ElePriority=1, BLPriority=1, HWPriority=1):
 
     node_filename = "data/nodes.txt"
     edge_filename = "data/edges.txt"
@@ -180,14 +180,14 @@ def optimize(lat1, lon1, lat2, lon2):
     A = closest_node((lat1, lon1), graph_nodes)
     B = closest_node((lat2, lon2), graph_nodes)
 
-    # Get the get the point that has that closest value
+    # Get the point that has that closest value
     A_id = list(g.nodes.keys())[A]
     B_id = list(g.nodes.keys())[B]
 
     print("Closest A found!", A_id)
     print("Closest B found!", B_id)
 
-    route = g.dijkstra_path(A_id, B_id)
+    route = g.dijkstra_path(A_id, B_id, DisPriority, ElePriority, BLPriority, HWPriority)
     print("route found:")
 
     # format output:
