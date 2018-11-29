@@ -34,7 +34,7 @@ class Graph:
         self.adjacencyList[node.name] = []
 
 
-    def add_edge(self, A_name, B_name):
+    def add_edge(self, A_name, B_name, DisPriority, ElePriority, BLPriority, HWPriority):
         """
         Convert names 'A' to 'B' to points our functions can use, then
         add an edge from A to B with weight equal to the distance.
@@ -53,11 +53,12 @@ class Graph:
                   'elev':B_fields[2]}
 
         # Calculate edge weights
-        cost_to_B = preprocess_utils.cost(A, B)
+        cost_to_B = preprocess_utils.cost(A, B, DisPriority, ElePriority, BLPriority, HWPriority)
+        # ^^^ This is the method that needs fixing. It currently points to a preprocessing utility. It needs to be calculated dynamically.
         self.adjacencyList[A_name].append((B_name, cost_to_B))
 
 
-    def dijkstra_path(self, A, B, DisPriority, ElePriority, BLPriority, HWPriority, use_a_star=True, debug=False):
+    def dijkstra_path(self, A, B, use_a_star=True, debug=False):
         """ Return the shortest path from A to B using Dijkstra algo """
 
         if debug: print("nodes:", self.nodes)
@@ -100,8 +101,11 @@ class Graph:
                 neighbor_distances = [(neighbor[0], neighbor[1], distance)
                                       for (neighbor, distance)
                                       in zip(neighbors, distances)]
+                                      # neighbor_distances is an array of tuples containing the node name of a neighbor, the cost to that neighbor and euclidean distance between B and the neighbor
+                                      # This means that element 2 is the cost to that neighbor. Stored in the adjacency list above.
 
                 sorted_neighbors = sorted(neighbor_distances, key=lambda x:(x[int(use_a_star)]))
+                # sorted neighbors is just the sorted list of neighbor_distances
                 if debug: print(sorted_neighbors)
 
                 if use_a_star:
@@ -109,6 +113,7 @@ class Graph:
                 else:
                     if debug: print("checking unsorted neighbors:", sorted_neighbors)
                 for (u, ucost, udist) in sorted_neighbors:
+                	# ucost comes from element 2 of each member of sorted neighbors
                     if u == B:
                         if debug: print("paths searched:", onsidered)
                         # TODO: make sure this is returning at the right time.
@@ -121,6 +126,7 @@ class Graph:
                     if u in visited: continue
                     prev_cost = cost.get(u)
                     next_cost = vcost + ucost
+                    # based on this, ucost is the variable which we need to determine how it should be calculated
                     # Update cost, if taking this path is optimal
                     if next_cost < prev_cost:
                         cost[u] = next_cost
@@ -171,7 +177,7 @@ def optimize(lat1, lon1, lat2, lon2, DisPriority=1, ElePriority=1, BLPriority=1,
     print("Loading in edges of ", len(edges.keys()), "nodes.")
     for node in edges.keys():
         for neighbor in edges[node]:
-            g.add_edge(node, str(neighbor))
+            g.add_edge(node, str(neighbor), DisPriority, ElePriority, BLPriority, HWPriority)
 
     # find closest node to start and end
     graph_nodes = g.nodes.values()
@@ -187,7 +193,7 @@ def optimize(lat1, lon1, lat2, lon2, DisPriority=1, ElePriority=1, BLPriority=1,
     print("Closest A found!", A_id)
     print("Closest B found!", B_id)
 
-    route = g.dijkstra_path(A_id, B_id, DisPriority, ElePriority, BLPriority, HWPriority)
+    route = g.dijkstra_path(A_id, B_id)
     print("route found:")
 
     # format output:

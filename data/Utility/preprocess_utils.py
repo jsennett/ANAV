@@ -24,12 +24,18 @@ def incline(A, B):
     """ Calculate incline (meters) between A and B """
     return math.degrees(math.atan(elev_gain(A, B) / dist_2d(A, B)))
 
-def cost(A, B):
+def cost(A, B, DisPriority, IncPriority, BLPriority, HWPriority):
     """
     Calculate a 'cost' for traveling from A to B, where
-    cost = (distance * incline_multiplier)
+    cost is a dynamic function dependant on the priority
+    preferences defined by the user.
     """
-    return dist_3d(A, B) * incline_multiplier(incline(A, B))
+    cost = (DisPriority * dist_3d(A, B)) + (IncPriority * incline(A, B)) # TODO: find a way to work in the incline multiplier
+    # TODO: add in values based on whether bike lanes are present and what type of road it is.
+    # if (not bikelane)
+    # cost += BLPriority
+    # or something like that
+    return cost
 
 def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
                        damp=.01, exp_damp=.05):
@@ -40,6 +46,7 @@ def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
     This represents all downhills being "rests".
     The default parameters give pretty good approximations of "effort".
     """
+    # TODO: Conscider other ways to calculate this such that it works efficiently alongside the priority preferences.
     # Apply caps
     if incline > hard_cap:
         return incline_multiplier(hard_cap)
