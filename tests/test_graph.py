@@ -121,8 +121,6 @@ if __name__ == '__main__':
     # test_dijkstra()
     # test_a_star()
     # test_graph_real_data("../data/nodes.txt", "../data/edges.txt")
-    # test_short_path_2("../data/nodes.txt", "../data/edges.txt")
-    test_medium_short_path("../data/nodes.txt", "../data/edges.txt")
+    test_short_path_2("../data/nodes.txt", "../data/edges.txt")
+    # test_medium_short_path("../data/nodes.txt", "../data/edges.txt")
     # test_medium_path("../data/nodes.txt", "../data/edges.txt")
-
-    # g.calculate_costs()
