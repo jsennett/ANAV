@@ -1,76 +1,191 @@
-import os
-import time
-import pymysql
+import simplejson
+import urllib.request
+import psycopg2
+from psycopg2.extras import execute_values
 
 
-def create_database():
+def create_node_table(credentials):
 
-    conn = pymysql.connect(host='localhost',
-                           user='root',
-                           password=os.environ['MYSQL_PASSWORD'])
-
-    c = conn.cursor()
-    c.execute("CREATE DATABASE Anav")
-    conn.commit()
-    print("Database created.")
-
-    c.close()
-    conn.close()
-    print("Connection closed.")
-
-
-def query_nodes_in_rectangle(db):
-
-    conn = pymysql.connect(db)
+    conn = psycopg2.connect(**credentials)
     c = conn.cursor()
 
-    c.execute("SELECT * FROM nodes WHERE " +
-                "lat > 42.2704 AND " +
-                "lat < 42.4648 AND " +
-                "lon > -72.6924 AND " +
-                "lon < -72.3182")
-    results = c.fetchall()
-    print(results[:10])
-    print(len(results), "rows found.")
+    try:
+        c.execute("DROP TABLE IF EXISTS nodes")
+        c.execute("""
+                  CREATE TABLE nodes (
+                  id BIGINT NOT NULL UNIQUE,
+                  lat numeric NOT NULL,
+                  lon numeric NOT NULL,
+                  PRIMARY KEY (id))""")
+        print("table created.")
+    finally:
+        conn.commit()
+        c.close()
+        conn.close()
+        print("connection closed.")
 
-    c.close()
-    conn.close()
 
-def index_node_table(db):
+def create_way_table(credentials):
 
-    conn = pymysql.connect(db)
+    conn = psycopg2.connect(**credentials)
     c = conn.cursor()
 
-    c.execute("CREATE INDEX lat_idx ON nodes(lat)")
-    c.execute("CREATE INDEX lon_idx ON nodes(lon)")
-    c.execute("CREATE INDEX lat_lon_idx ON nodes(lat, lon)")
-    c.execute("CREATE INDEX lon_lat_idx ON nodes(lon, lat)")
-    conn.commit()
-    print("Indexes created.")
-    c.close()
-    conn.close()
+    try:
+        c.execute("DROP TABLE IF EXISTS ways")
+        c.execute("""
+                  CREATE TABLE ways (
+                  id BIGINT NOT NULL UNIQUE,
+                  highway text,
+                  bicycle text,
+                  cycleway text,
+                  PRIMARY KEY (id))""")
+        print("table created.")
+    finally:
+        conn.commit()
+        c.close()
+        conn.close()
+        print("connection closed.")
 
 
-def sample_table(table, limit, db, filter=''):
+def create_edge_table(credentials):
+
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+
+    try:
+        c.execute("DROP TABLE IF EXISTS edges")
+        c.execute("""
+                  CREATE TABLE edges (
+                  id BIGSERIAL PRIMARY KEY,
+                  way_id BIGINT NOT NULL,
+                  start_node_id BIGINT NOT NULL,
+                  end_node_id BIGINT NOT NULL,
+                  highway text,
+                  bicycle text,
+                  cycleway text
+                  )""")
+        print("table created.")
+    finally:
+        conn.commit()
+        c.close()
+        conn.close()
+        print("connection closed.")
+
+
+def add_spatial_node_column(credentials):
+
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+
+    try:
+        c.execute("ALTER TABLE nodes ADD COLUMN coord geometry(POINT, 4326)")
+        c.execute("UPDATE nodes SET coord = ST_SetSRID(ST_MakePoint(lon, lat), 4326)")
+        c.execute("CREATE INDEX coord_gist ON nodes USING GIST (coord)")
+    finally:
+        conn.commit()
+        print("coord column added.")
+        c.close()
+        conn.close()
+        print("connection closed.")
+
+
+def flag_irrelevant_nodes(credentials):
+
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+
+    try:
+        c.execute("ALTER TABLE nodes ADD COLUMN is_road BOOLEAN")
+        c.execute("UPDATE nodes SET is_road = TRUE WHERE id IN (SELECT id FROM ways WHERE highway != ''))")
+    finally:
+        conn.commit()
+        print("coord column added.")
+        c.close()
+        conn.close()
+        print("connection closed.")
+
+
+def nodes_within_radius(credentials, lat=42.359055, lon=-71.093500, miles=10, limit=10000):
+
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+
+    results = []
+    sql = """
+            SELECT id, lat, lon
+            FROM nodes
+            WHERE ST_DistanceSphere(coord, ST_MakePoint(%s,%s))
+            <= %s * 1609.34 LIMIT %s;
+          """
+    input = (lon, lat, miles, limit)
+
+    try:
+        c.execute(sql, input)
+        results = c.fetchall()
+        print(len(results))
+    except:
+        print("exception!")
+    finally:
+        c.close()
+        conn.close()
+        print("connection closed.")
+
+    return results
+
+def nearest_node(credentials, lat=42.359055, lon=-71.093500, meters=100):
+
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+
+    results = []
+    sql = """
+            SELECT id, lat, lon
+            FROM nodes
+            WHERE ST_DistanceSphere(coord, ST_MakePoint(%s,%s)) <= %s
+            ORDER BY coord <-> ST_SetSRID(ST_MakePoint(%s,%s),4326)
+            LIMIT 1;
+          """
+    input = (lon, lat, meters, lon, lat)
+
+    try:
+        c.execute(sql, input)
+        results = c.fetchall()
+        print(len(results))
+    except:
+        print("exception!")
+    finally:
+        c.close()
+        conn.close()
+        print("connection closed.")
+
+    return results
+
+
+def sample_table(credentials, table='nodes', columns='*', limit=10, filter=''):
     """ Get some rows from a table; useful for exploring and debugging. """
     # Connect
-    conn = pymysql.connect(db)
+    conn = psycopg2.connect(credentials)
     c = conn.cursor()
 
     # Query
-    c.execute("SELECT * FROM %s %s LIMIT %i" % (table, filter, limit))
-    rows = c.fetchall()
+    rows = []
+    sql = "SELECT %s FROM %s %s LIMIT %s"
+    input = (columns, table, filter, limit)
 
-    # Close
-    c.close()
-    conn.close()
+    try:
+        c.execute(sql, input)
+        rows = c.fetchall()
+    finally:
+        c.close()
+        conn.close()
+
     return rows
 
 
-def count_rows(table, db, filter=''):
+def count_rows(table, credentials, filter=''):
     """ Count rows in a table; useful for exploring and debugging. """
     # Connect
-    conn = pymysql.connect(db)
+    conn = psycopg2.connect(**credentials)
     c = conn.cursor()
 
     # Query
@@ -83,44 +198,58 @@ def count_rows(table, db, filter=''):
     return count
 
 
-def preview_tables(db):
-    # Preview tables
-    nodes = sample_table('nodes', 25, db)
-    edges = sample_table('edges', 25, db)
-    ways = sample_table('ways', 25, db)
-    ways_with_attributes = sample_table('ways', 25, db, "WHERE bicycle != '' AND cycleway != ''")
+def update_elevation(credentials, api_key, debug=False):
 
-    from pprint import pprint
-    pprint(nodes)
-    pprint(edges)
-    pprint(ways)
-    pprint(ways_with_attributes)
+    url_head = 'https://maps.googleapis.com/maps/api/elevation/json?locations='
+    url_tail = "&key=" + api_key
 
-    num_nodes = count_rows('nodes', db)
-    num_edges = count_rows('edges', db)
-    num_ways = count_rows('ways', db)
-    num_ways_with_attributes = count_rows('ways', db, "WHERE bicycle != '' AND cycleway != ''")
+    # Get nodes from database
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+    batch_size = 300
 
-    print(num_nodes, "nodes rows")
-    print(num_edges, "edges rows")
-    print(num_ways, "ways rows")
-    print(num_ways_with_attributes, "ways with all attributes")
+    intervals = range(1000, 10000)
+    # intervals = range(10000, 14223)
+    # offsets = [0, batch_size, 2*batch_size]
+    for interval in intervals:
 
+        # Select a batch of rows
+        batch_ns = (batch_size * interval, batch_size * (interval + 1))
+        sql = "SELECT n, lat, lon FROM nodes WHERE n > %s AND n <= %s"
+        c.execute(sql, (batch_ns))
+        rows = c.fetchall()
 
-if __name__ == '__main__':
-    start = time.time()
-    query_nodes_in_rectangle()
-    print(time.time() - start, "seconds")
-    # 468443 rows found.
-    # 18.889117002487183
+        # Once we reach the end of the table, we won't have any rows left.
+        if len(rows) == 0:
+            break
 
-    start = time.time()
-    index_node_table()
-    print(time.time() - start, "seconds")
-    # # 70 seconds to create indexes
+        if debug:
+            print('First row in batch:', rows[0])
+            print('Last row in batch:', rows[-1])
+            print('Rows fetched from database:', len(rows))
 
-    start = time.time()
-    query_nodes_in_rectangle()
-    print(time.time() - start, "seconds")
-    # 468443 rows found.
-    # 7.956459999084473 seconds
+        # get elevation data for these rows
+        url_middle = '|'.join([str(row[1]) + ',' + str(row[2]) for row in rows])
+        query = url_head + url_middle + url_tail
+        assert(len(query) < 8192)
+        response = simplejson.load(urllib.request.urlopen(query))
+
+        if debug:
+            print("status:", response.get('status'))
+            print('number of elevations found:', len(response.get('results')))
+
+        assert(response.get('status') == 'OK')
+        assert(len(response.get('results', [])) == len(rows))
+
+        # Combine id with elevation
+        ns = [row[0] for row in rows]
+        elevations = [row['elevation'] for row in response['results']]
+        ns_to_elevations = list(zip(ns, elevations))
+
+        sql_insert = "INSERT INTO elevation (n, elevation) VALUES %s"
+        execute_values(c, sql_insert, ns_to_elevations)
+        conn.commit()
+        print("********** Nodes updated with elevation", batch_ns, "**********")
+
+    c.close()
+    conn.close()
