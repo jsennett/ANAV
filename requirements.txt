@@ -1,0 +1,11 @@
+Flask==1.0.2
+Flask-Cors==3.0.6
+geographiclib==1.49
+heapdict==1.0.0
+Jinja2==2.10
+lxml==4.2.5
+OSMPythonTools==0.2.4
+pep8==1.7.1
+psycopg2-binary==2.7.6.1
+pytest==3.8.0
+urllib3==1.23
