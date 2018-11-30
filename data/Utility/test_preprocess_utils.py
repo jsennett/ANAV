@@ -53,3 +53,6 @@ if __name__ == '__main__':
     test_all(A, D)
 
     print("*" * 80)
+
+    display_incline_multipliers()
+    

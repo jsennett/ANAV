@@ -34,7 +34,7 @@ class Graph:
         self.adjacencyList[node.name] = []
 
 
-    def add_edge(self, A_name, B_name, DisPriority, ElePriority, BLPriority, HWPriority):
+    def add_edge(self, A_name, B_name, ElePriority, BLPriority, HWPriority):
         """
         Convert names 'A' to 'B' to points our functions can use, then
         add an edge from A to B with weight equal to the distance.
@@ -151,7 +151,7 @@ def heuristic(v, u):
 
 
 
-def optimize(lat1, lon1, lat2, lon2, DisPriority=1, ElePriority=1, BLPriority=1, HWPriority=1):
+def optimize(lat1, lon1, lat2, lon2, ElePriority=0.5, BLPriority=0, HWPriority=0.5):
 
     node_filename = "data/nodes.txt"
     edge_filename = "data/edges.txt"
