@@ -3,9 +3,6 @@ from heapq import heappop, heappush
 import json
 import numpy as np
 
-sys.path.append('../')
-from data.Utility import preprocess_utils
-
 inf = float('inf')
 
 
