@@ -166,7 +166,6 @@ def nearest_node(credentials, lat=42.359055, lon=-71.093500, meters=100):
     try:
         c.execute(sql, input)
         results = c.fetchone()
-        print(len(results))
     finally:
         c.close()
         conn.close()
