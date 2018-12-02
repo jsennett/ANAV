@@ -2,14 +2,14 @@ import xml.etree.ElementTree as etree
 import json
 import psycopg2
 from psycopg2.extras import execute_values
-import database_utils
+import data_ingestion_utils
 
 
 def parse_nodes(filename, credentials):
     """ Parse <node> elements in an OSM XML file, updating a database
     with the 'node' rows contained within.
     """
-    database_utils.create_node_table(credentials)
+    data_ingestion_utils.create_node_table(credentials)
     node_insert_sql = 'INSERT INTO nodes (id, lat, lon) VALUES %s'
 
     conn = psycopg2.connect(**credentials)
@@ -67,8 +67,8 @@ def parse_ways(filename, credentials, debug=False):
     c = conn.cursor()
 
     # Set up tables
-    database_utils.create_edge_table(credentials)
-    database_utils.create_way_table(credentials)
+    data_ingestion_utils.create_edge_table(credentials)
+    data_ingestion_utils.create_way_table(credentials)
     print("Edge and way tables created.")
 
     way_insert_sql = 'INSERT INTO ways (id, highway, bicycle, cycleway) VALUES %s'
