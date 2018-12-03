@@ -53,7 +53,7 @@ class Graph:
                   'elev':B_fields[2]}
 
         # Calculate edge weights
-        cost_to_B = preprocess_utils.cost(A, B, DisPriority, ElePriority, BLPriority, HWPriority)
+        cost_to_B = preprocess_utils.cost(A, B, ElePriority, BLPriority, HWPriority, bikelane, road_type)
         # ^^^ This is the method that needs fixing. It currently points to a preprocessing utility. It needs to be calculated dynamically.
         self.adjacencyList[A_name].append((B_name, cost_to_B))
 

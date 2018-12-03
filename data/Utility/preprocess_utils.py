@@ -24,13 +24,13 @@ def incline(A, B):
     """ Calculate incline (meters) between A and B """
     return math.degrees(math.atan(elev_gain(A, B) / dist_2d(A, B)))
 
-def cost(A, B, IncPriority, BLPriority, HWPriority):
+def cost(A, B, IncPriority, BLPriority, HWPriority, bikelane=false, road_type=""):
     """
     Calculate a 'cost' for traveling from A to B, where
     cost is a dynamic function dependant on the priority
     preferences defined by the user.
     """
-    cost = dist_3d(A, B) * ((IncPriority * incline_multiplier(incline(A, B)) + (BLPriority * BL_multiplier()) + (HWPriority * HW_multiplier()))) # TODO: find a way to work in the incline multiplier
+    cost = dist_3d(A, B) * ((IncPriority * incline_multiplier(incline(A, B)) + (BLPriority * BL_multiplier(bikelane)) + (HWPriority * HW_multiplier(road_type)))) # TODO: find a way to work in the incline multiplier
     # TODO: add in values based on whether bike lanes are present and what type of road it is.
     # if (not bikelane)
     # cost += BLPriority * Some Hard Coded Value
@@ -66,6 +66,12 @@ def BL_multiplier(bikelane):
     return 0
 
 def HW_multiplier(road_type):
-    if road_type is in #some list of bad road types:
+    if road_type in ["motorway", "service"]:
         return 93
-    return 0
+    if road_type in ["primary", "secondary", "tertiary"]:
+        return 62
+    if road_type in ["tertiary", "other"]:
+        return 31
+    if road_type in ["residential", "cycleway"]:
+        return 0
+    return 31
