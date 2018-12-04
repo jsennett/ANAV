@@ -2,6 +2,7 @@ from graph_utils import *
 import json
 from time import time
 from pprint import pprint
+import amherst
 
 def test_graph():
     g = Graph()
@@ -54,7 +55,7 @@ def test_dijkstra():
     print(path)
 
 
-def test_graph_real_data(node_filename, edge_filename):
+def test_graph_amherst_data():
 
     with open(node_filename, 'r') as f:
         nodes = json.load(f)

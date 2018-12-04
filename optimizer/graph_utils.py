@@ -150,7 +150,7 @@ def heuristic(v, u):
     return (v[0] - u[0])**2 + (v[1]-u[1])**2
 
 
-
+### need work
 def optimize(lat1, lon1, lat2, lon2, ElePriority=0.5, BLPriority=0, HWPriority=0.5):
 
     node_filename = "data/nodes.txt"
