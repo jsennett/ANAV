@@ -35,9 +35,10 @@ class Graph:
         self.adjacencyList[node.id] = []
 
 
-    def add_edge(self, distance, incline, ElePriority, BLPriority, HWPriority):
+    def add_edge(self, A_id, B_id, distance, incline, ElePriority, BLPriority, HWPriority):
         # Calculate edge weights
-        cost_to_B = cost.cost(distance, incline, ElePriority, BLPriority, HWPriority)
+        #cost_to_B = cost.cost(distance, incline, ElePriority, BLPriority, HWPriority)
+        cost_to_B = distance + incline
         # ^^^ This is the method that needs fixing. It currently points to a preprocessing utility. It needs to be calculated dynamically.
         self.adjacencyList[A_id].append((B_id, cost_to_B))
 
@@ -180,7 +181,7 @@ def optimize(area, lat1, lon1, lat2, lon2, ElePriority=0.5, BLPriority=0, HWPrio
 
     route = g.dijkstra_path(A_id, B_id)
     print("route found:")
-
+    print(route)
     # format output:
     return route
 

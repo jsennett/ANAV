@@ -1,4 +1,5 @@
 import math
+from decimal import Decimal
 
 def cost(distance, incline, IncPriority, BLPriority, HWPriority):
     """
@@ -8,7 +9,7 @@ def cost(distance, incline, IncPriority, BLPriority, HWPriority):
     """
 
     #need modified
-    cost = distance * (1 + IncPriority * incline_multiplier(incline) + BLPriority * BL_multiplier() + HWPriority * HW_multiplier())
+    cost = distance * (Decimal(1) + IncPriority * incline_multiplier(incline) + BLPriority * BL_multiplier(True) + HWPriority * HW_multiplier(0))
     # TODO: add in values based on whether bike lanes are present and what type of road it is.
     # if (not bikelane)
     # cost += BLPriority * Some Hard Coded Value
@@ -16,7 +17,7 @@ def cost(distance, incline, IncPriority, BLPriority, HWPriority):
     return cost
 
 def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
-                       damp=.01, exp_damp=.05):
+                       damp=Decimal(.01), exp_damp=Decimal(.05)):
     """
     Calculate a cost multiplier for a given incline, representing relative effort.
 
@@ -44,6 +45,8 @@ def BL_multiplier(bikelane):
     return 0
 
 def HW_multiplier(road_type):
+    """
     if road_type is in #some list of bad road types:
         return 93
+    """
     return 0
