@@ -1,36 +1,14 @@
-from geographiclib.geodesic import Geodesic
 import math
 
-
-
-def dist_2d(A, B):
-    """ Calculate 2d distance (meters) between A and B """
-    result = Geodesic.WGS84.Inverse(A['lat'], A['lon'], B['lat'], B['lon'])
-    return result['s12']
-
-
-def elev_gain(A, B):
-    """ Calculate elevation gain (meters) from A to B """
-    return B['elev'] - A['elev']
-
-
-def dist_3d(A, B):
-    """ Calculate 3d distance (meters) between A and B """
-    dist_3d = (dist_2d(A, B)**2 + elev_gain(A, B)**2) ** (.5)
-    return dist_3d
-
-
-def incline(A, B):
-    """ Calculate incline (meters) between A and B """
-    return math.degrees(math.atan(elev_gain(A, B) / dist_2d(A, B)))
-
-def cost(A, B, IncPriority, BLPriority, HWPriority):
+def cost(distance, incline, IncPriority, BLPriority, HWPriority):
     """
     Calculate a 'cost' for traveling from A to B, where
     cost is a dynamic function dependant on the priority
     preferences defined by the user.
     """
-    cost = dist_3d(A, B) * ((IncPriority * incline_multiplier(incline(A, B)) + (BLPriority * BL_multiplier()) + (HWPriority * HW_multiplier()))) # TODO: find a way to work in the incline multiplier
+
+    #need modified
+    cost = distance * (1 + IncPriority * incline_multiplier(incline) + BLPriority * BL_multiplier() + HWPriority * HW_multiplier())
     # TODO: add in values based on whether bike lanes are present and what type of road it is.
     # if (not bikelane)
     # cost += BLPriority * Some Hard Coded Value
@@ -49,9 +27,9 @@ def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
     # TODO: Conscider other ways to calculate this such that it works efficiently alongside the priority preferences.
     # Apply caps
     if incline > hard_cap:
-        return incline_multiplier(hard_cap)
+        return incline_multiplier(hard_cap, hard_cap=hard_cap)
     elif incline < neg_cap:
-        return incline_multiplier(neg_cap)
+        return incline_multiplier(neg_cap, neg_cap=neg_cap)
 
     # Calculate differently for uphills and downhills
     if incline < 0:

@@ -5,10 +5,6 @@ def test_cost(A, B):
     return cost(A, B)
 
 def test_all(A, B):
-    print("dist_2d", dist_2d(A, B), "m")
-    print("elev_gain", elev_gain(A, B), "m")
-    print("dist_3d", dist_3d(A, B), "m")
-    print("incline", incline(A, B), "%")
     print("cost", cost(A, B))
     print("incline_multiplier", incline_multiplier(incline(A, B)))
 
@@ -34,7 +30,7 @@ if __name__ == '__main__':
     D = {'lat':42.3489313,
          'lon': -72.5679691,
          'elev': 150}
-
+"""
     print("*" * 80)
     print("Two points on a very steep uphill: ")
     test_all(A, B)
@@ -55,4 +51,4 @@ if __name__ == '__main__':
     print("*" * 80)
 
     display_incline_multipliers()
-
+"""

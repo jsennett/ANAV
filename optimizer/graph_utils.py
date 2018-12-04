@@ -35,28 +35,11 @@ class Graph:
         self.adjacencyList[node.id] = []
 
 
-    def add_edge(self, A_name, B_name, distance, ElePriority, BLPriority, HWPriority):
-        """
-        Convert names 'A' to 'B' to points our functions can use, then
-        add an edge from A to B with weight equal to the distance.
-        """
-        # Get nodes from node names
-        A_fields = self.nodes.get(A_name)
-        B_fields = self.nodes.get(B_name)
-
-        # Convert to expected dictionaries
-        A = {'lat':A_fields[0],
-                  'lon':A_fields[1],
-                  'elev':A_fields[2]}
-
-        B = {'lat':B_fields[0],
-                  'lon':B_fields[1],
-                  'elev':B_fields[2]}
-
+    def add_edge(self, distance, incline, ElePriority, BLPriority, HWPriority):
         # Calculate edge weights
-        cost_to_B = cost.cost(A, B, distance, ElePriority, BLPriority, HWPriority)
+        cost_to_B = cost.cost(distance, incline, ElePriority, BLPriority, HWPriority)
         # ^^^ This is the method that needs fixing. It currently points to a preprocessing utility. It needs to be calculated dynamically.
-        self.adjacencyList[A_name].append((B_name, cost_to_B))
+        self.adjacencyList[A_id].append((B_id, cost_to_B))
 
 
     def dijkstra_path(self, A, B, use_a_star=True, debug=False):
@@ -178,7 +161,8 @@ def optimize(area, lat1, lon1, lat2, lon2, ElePriority=0.5, BLPriority=0, HWPrio
             end_node_lon = way[5]
             g.add_node(Node(end_node_id, (end_node_lat, end_node_lon))) #add end node to graph, for closest_node() method
         distance = way[6]
-        g.add_edge(start_node_id, end_node_id, distance, ElePriority, BLPriority, HWPriority)
+        incline = way[10]
+        g.add_edge(start_node_id, end_node_id, distance, incline, ElePriority, BLPriority, HWPriority)
 
     # find closest node to start and end
     graph_nodes = g.nodes.values()
