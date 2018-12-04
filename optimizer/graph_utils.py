@@ -4,21 +4,22 @@ import json
 import numpy as np
 
 sys.path.append('../')
-from data.Utility import preprocess_utils
+import cost
+import amherst
+from decimal import Decimal
 
 inf = float('inf')
 
 
 class Node:
 
-    def __init__(self, name, coord, elev):
-        self.name = name
+    def __init__(self, id, coord):
+        self.id = id
         self.lat = coord[0]
         self.lon = coord[1]
-        self.elev = elev
 
     def __repr__(self):
-        return "\n Node %s: (%i, %i), %im" % (self.name, self.lat, self.lon, self.elev)
+        return "\n Node %s: (%i, %i)" % (self.id, self.lat, self.lon)
 
 
 class Graph:
@@ -29,12 +30,12 @@ class Graph:
 
 
     def add_node(self, node):
-        assert(node not in self.nodes)
-        self.nodes[node.name] = (node.lat, node.lon, node.elev)
-        self.adjacencyList[node.name] = []
+        #this node should not be in nodes
+        self.nodes[node.id] = (node.lat, node.lon)
+        self.adjacencyList[node.id] = []
 
 
-    def add_edge(self, A_name, B_name, ElePriority, BLPriority, HWPriority):
+    def add_edge(self, A_name, B_name, distance, ElePriority, BLPriority, HWPriority):
         """
         Convert names 'A' to 'B' to points our functions can use, then
         add an edge from A to B with weight equal to the distance.
@@ -53,7 +54,7 @@ class Graph:
                   'elev':B_fields[2]}
 
         # Calculate edge weights
-        cost_to_B = preprocess_utils.cost(A, B, DisPriority, ElePriority, BLPriority, HWPriority)
+        cost_to_B = cost.cost(A, B, distance, ElePriority, BLPriority, HWPriority)
         # ^^^ This is the method that needs fixing. It currently points to a preprocessing utility. It needs to be calculated dynamically.
         self.adjacencyList[A_name].append((B_name, cost_to_B))
 
@@ -151,33 +152,33 @@ def heuristic(v, u):
 
 
 ### need work
-def optimize(lat1, lon1, lat2, lon2, ElePriority=0.5, BLPriority=0, HWPriority=0.5):
-
-    node_filename = "data/nodes.txt"
-    edge_filename = "data/edges.txt"
+def optimize(area, lat1, lon1, lat2, lon2, ElePriority=0.5, BLPriority=0, HWPriority=0.5):
 
     # create a graph
     g = Graph()
 
-    # read in data
-    with open(node_filename, 'r') as f:
-        nodes = json.load(f)
+    # initial the graph
+    # area read in from DB
+    # assume amherst.py is the data format
 
-    with open(edge_filename, 'r') as f:
-        edges = json.load(f)
+    #use amherst.amherst as mock data
+    area = amherst.amherst
 
     # add nodes and edges
-    print("Loading in", len(nodes.keys()), "nodes.")
-    for n in nodes.keys():
-        id = n
-        ele = nodes[n][0]
-        lat, lon = nodes[n][1]
-        g.add_node(Node(id, (lat, lon), ele))
-
-    print("Loading in edges of ", len(edges.keys()), "nodes.")
-    for node in edges.keys():
-        for neighbor in edges[node]:
-            g.add_edge(node, str(neighbor), DisPriority, ElePriority, BLPriority, HWPriority)
+    # lat and lon are Decimal objs
+    for way in area:
+        start_node_id = way[0]
+        if(g.nodes.get(start_node_id)==None):
+            start_node_lat = way[1]
+            start_node_lon = way[2]
+            g.add_node(Node(start_node_id, (start_node_lat, start_node_lon))) #add start node to graph
+        end_node_id = way[3]
+        if(g.nodes.get(end_node_id)==None):
+            end_node_lat = way[4]
+            end_node_lon = way[5]
+            g.add_node(Node(end_node_id, (end_node_lat, end_node_lon))) #add end node to graph, for closest_node() method
+        distance = way[6]
+        g.add_edge(start_node_id, end_node_id, distance, ElePriority, BLPriority, HWPriority)
 
     # find closest node to start and end
     graph_nodes = g.nodes.values()
