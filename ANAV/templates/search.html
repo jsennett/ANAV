@@ -39,7 +39,15 @@
           background-color: #111;
       }
 
-
+      fieldset{
+            background-color: #fff;
+            border: none;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            padding: 0 .625em;
+      }
+      
     </style>
   </head>
 
@@ -57,7 +65,34 @@
       <label for="Destination">Destination</label>
       <input type="text" name="Destination" id="Destination"  value = '{{Destinationtext}}' required>
       <input type="submit" value="Search Path">
+      <fieldset><br>
+
+        <a>Flatness:</a><input type="range" name="flatness_range" id="flatness_range" min="0" max="100" step="5" onchange="flatness_val.value=this.value"/>
+        <output id="flatness_val" for="flatness_range" >50</output><br>
+
+        <a>Bicycle Designation:</a> <input type="range" name="bicycle_range" id="bicycle_range" min="0" max="100" step="5" onchange="bicycle_val.value=this.value"/>
+        <output id="bicycle_val" for="bicycle_range" >50</output><br>
+
+        <a>Short Distance: </a><input type="range" name="distance_range" id="distance_range" min="0" max="100" step="5" onchange="distance_val.value=this.value"/>
+        <output id="distance_val" for="distance_range" >50</output><br>
+
+      </fieldset>
+
+      <fieldset>
+
+        <a>Motorway:</a><input type="range" name="motorway_range" id="motorway_range" min="0" max="100" step="5" onchange="motorway_val.value=this.value"/>
+        <output id="motorway_val" for="motorway_range" >50</output><br>
+
+        <a>Primary Highway:</a> <input type="range" name="highway_range" id="highway_range" min="0" max="100" step="5" onchange="highway_val.value=this.value"/>
+        <output id="highway_val" for="highway_range" >50</output><br>
+
+        <a>Residential Roads: </a><input type="range" name="residential_range" id="residential_range" min="0" max="100" step="5" onchange="residential_val.value=this.value"/>
+        <output id="residential_val" for="residential_range" >50</output><br>
+
+      </fieldset>
+      
     </form>
+    
 
     <div id="map"></div>
     <script>

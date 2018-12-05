@@ -17,6 +17,24 @@ def search():
 	if request.method == 'POST':
 		CurPos = request.form['CurPos']
 		Destination = request.form['Destination']
+
+		flatness_val = float(request.form['flatness_range'])/100
+		bicycle_val = float(request.form['bicycle_range'])/100
+		distance_val = float(request.form['distance_range'])/100
+		
+		motorway_val = float(request.form['motorway_range'])/100
+		highway_val = float(request.form['highway_range'])/100
+		residential_val = float(request.form['residential_range'])/100
+
+		print("Flatness_val=",flatness_val)
+		print("Bicycle_val=",bicycle_val)
+		print("Distance_val=",distance_val)
+		print("motorway_val=",motorway_val)
+		print("highway_val=",highway_val)
+		print("residential_val=",residential_val)
+
+
+		#f = request.form['flatness_range']
 		error = None
 
 		if CurPos is None:
@@ -43,17 +61,15 @@ def search():
 			print("to")
 			print(Destination_location.latitude, Destination_location.longitude)
 
-			route = graph_utils.optimize(CurPos_location.latitude,CurPos_location.longitude,
-								 Destination_location.latitude, Destination_location.longitude)
+			# Get Optimized route from the optimizer
+			#route = graph_utils.optimize(CurPos_location.latitude,CurPos_location.longitude,
+			#					 Destination_location.latitude, Destination_location.longitude)
 
 
-
-			# route = get_route(CurPos_location.latitude,CurPos_location.longitude, Destination_location.latitude, Destination_location.longitude)
+			route = get_route(CurPos_location.latitude,CurPos_location.longitude, Destination_location.latitude, Destination_location.longitude)
+			
 			length = len(route);
-			# print(route)
-			#print('CurPos_location = ')
-			#print((CurPos_location.latitude,CurPos_location.longitude))
-			#return render_template('search.html')
+			
 			return render_template('search.html',Destinationtext = Destination, CurPostext = CurPos, length = length, route = route)
 
 		flash(error);
