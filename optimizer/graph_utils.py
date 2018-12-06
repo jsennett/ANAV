@@ -2,8 +2,17 @@ import sys
 from heapq import heappop, heappush
 import json
 import numpy as np
+from geographiclib.geodesic import Geodesic
 
+sys.path.append("..")
+from data.database_utils import nearest_node, edges_within_radius
+from data.config import credentials
+
+# infinity value, used in Dijkstra
 inf = float('inf')
+
+# Maximum distance allowed between input start and end points (meters)
+MAX_DISTANCE = 50000
 
 
 class Node:
@@ -128,66 +137,154 @@ class Graph:
         return [A]
 
 
+def optimize(A, B, preferences, debug=False):
+    """
+    Main driver of the graph optimization.
 
-def closest_node(node, nodes):
-    """ return the node closest to a node you give me """
-    nodes = np.asarray(nodes)
-    dist_2 = np.sum((nodes - node)**2, axis=1)
-    return np.argmin(dist_2)
+    @input
+    A: tuple of floats - (lat, lon)
+    B: tuple of floats - (lat, lon)
+    preferences: tuple of floats -
+                (flatness_val, bicycle_val, distance_val,
+                 motorway_val, highway_val, residential_val)
+
+    @return
+    route - an ordered list of nodes [(lat, lon), (lat, lon)] from A to B
+    """
+    # Unpack values
+    A_lat, A_lon = A
+    B_lat, B_lon = B
+    (flatness_val, bicycle_val, distance_val,
+    motorway_val, highway_val, residential_val) = preferences
+
+    # Validate input parameters
+    if not valid_point(A_lat, A_lon):
+        print("Invalid start point", A)
+        return []
+    if not valid_point(B_lat, B_lon):
+        print("Invalid end point", B)
+        return []
+    if any([preference < 0 or preference > 100 for preference in preferences]):
+        print("Invalid preferences", preferences)
+        return []
+
+    AB_dist = dist_2d(A, B)
+    if AB_dist > MAX_DISTANCE:
+        print("Start and end points are further than maximum allowed distance",
+              AB_dist, "meters", MAX_DISTANCE, "allowed.")
+        return []
+
+    # Find nearest nodes in our database to A and B
+    s = nearest_node(credentials, lat=A_lat, lon=A_lon)
+    if s is None:
+        print("No node found near", A)
+        return []
+    else:
+        s_id, s_lat, s_lon = s
+
+    t = nearest_node(credentials, lat=B_lat, lon=B_lon)
+    if t is None:
+        print("No node found near", B)
+        return []
+    else:
+        t_id, t_lat, t_lon = t
+
+    # Calculate midpoint
+    m_lat, m_lon = midpoint((s_lat, s_lon), (t_lat, t_lon))
+
+    # Calculate search radius
+    r = search_radius((s_lat, s_lon), (t_lat, t_lon))
+
+    # Get data from search radius
+    edges_to_search = edges_within_radius(credentials, lat=m_lat, lon=m_lon, radius=r)
+
+    # Print debug messages, if specified.
+    if debug:
+        print("Graph will be created with ", len(edges_to_search), "edges")
+        print("radius:", r)
+        print("midpoint:", m_lat, m_lon)
+        print("s:", s)
+        print("t:", t)
+        print("AB_dist:", AB_dist)
+        print("st_dist:", dist_2d((s_lat, s_lon), (t_lat, t_lon)))
+        print("sample edges:", edges_to_search[:10])
+        print("preferences:", preferences)
+
+    # TODO: build the graph g, call g.dijkstra_path, and return the shortest path
+    # g = Graph()
+    # shortest_path = g.dijkstra_path(s, t))
+    # return shortest_path
+
+
+def midpoint(s, t):
+    """
+    Calculate the midpoint between points s and t.
+    @input
+    s: tuple of floats (lat, lon)
+    t: tuple of floats (lat, lon)
+
+    @return
+    m: tuple of floats (lat, lon)
+    """
+    l = Geodesic.WGS84.InverseLine(*s, *t)
+    # Compute the midpoint
+    m = l.Position(0.5 * l.s13)
+    return (m['lat2'], m['lon2'])
+
+
+def search_radius(s, t):
+    """
+    Calculate the search radius between points s and t.
+    The search radius should be the radius of a circle that
+    includes points (s, t) plus some buffer area.
+
+    @input
+    s: tuple of floats - (lat, lon)
+    t: tuple of floats - (lat, lon)
+
+    @return
+    r: float - radius, in meters
+    """
+    st_dist = dist_2d(s, t)
+
+    # For a small search radius, we can afford a large buffer.
+    # This will ensure we get edges that may be part of s-t path
+    #
+    # For a large search radius, we can't afford a large buffer;
+    # the graph will have too many edges which is expensive to
+    # retrieve and slow to find optimal route.
+    if st_dist < 5000:
+        buffer = .5
+    elif 5000 <= st_dist < 10000:
+        buffer = .25
+    else:
+        buffer = .1
+
+    return (1 + buffer) * st_dist * .5
+
+
+def dist_2d(A, B):
+    """
+    Calculate 2d distance, in meters, between A and B
+    @input
+    s: tuple of floats (lat, lon)
+    t: tuple of floats (lat, lon)
+
+    @return
+    m: tuple of floats (lat, lon)
+    """
+
+    result = Geodesic.WGS84.Inverse(*A, *B)
+    return result['s12']
+
+
+def valid_point(lat, lon):
+    if lon < -73.6 or lon > -69.8 or lat < 41.0 or lat > 43.0:
+        return False
+    else:
+        return True
 
 
 def heuristic(v, u):
     """ L2 distance of nodes (X, Y, )"""
     return (v[0] - u[0])**2 + (v[1]-u[1])**2
-
-
-
-def optimize(lat1, lon1, lat2, lon2):
-
-    node_filename = "data/nodes.txt"
-    edge_filename = "data/edges.txt"
-
-    # create a graph
-    g = Graph()
-
-    # read in data
-    with open(node_filename, 'r') as f:
-        nodes = json.load(f)
-
-    with open(edge_filename, 'r') as f:
-        edges = json.load(f)
-
-    # add nodes and edges
-    print("Loading in", len(nodes.keys()), "nodes.")
-    for n in nodes.keys():
-        id = n
-        ele = nodes[n][0]
-        lat, lon = nodes[n][1]
-        g.add_node(Node(id, (lat, lon), ele))
-
-    print("Loading in edges of ", len(edges.keys()), "nodes.")
-    for node in edges.keys():
-        for neighbor in edges[node]:
-            g.add_edge(node, str(neighbor))
-
-    # find closest node to start and end
-    graph_nodes = g.nodes.values()
-    graph_nodes = [node[0:2] for node in graph_nodes]
-
-    A = closest_node((lat1, lon1), graph_nodes)
-    B = closest_node((lat2, lon2), graph_nodes)
-
-    # Get the get the point that has that closest value
-    A_id = list(g.nodes.keys())[A]
-    B_id = list(g.nodes.keys())[B]
-
-    print("Closest A found!", A_id)
-    print("Closest B found!", B_id)
-
-    route = g.dijkstra_path(A_id, B_id)
-    print("route found:")
-
-    # format output:
-    return route
-
-    # g.dijkstra_path()
