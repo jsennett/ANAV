@@ -87,11 +87,11 @@ class Graph:
 
                 ######rework needed, should be weight + L2 distance
                 # Instead of sorting by weight, sort by L2 distance.
-                neighbors = [neighbor for neighbor in self.adjacencyList.get(v)]
+                neighbors = [neighbor for neighbor in self.adjacencyList.get(v, [])]
 
                 distances = [heuristic(self.nodes.get(B),
                                              self.nodes.get(neighbor[0]))
-                             for neighbor in self.adjacencyList.get(v)]
+                             for neighbor in self.adjacencyList.get(v, [])]
                 neighbor_distances = [(neighbor[0], neighbor[1], distance)
                                       for (neighbor, distance)
                                       in zip(neighbors, distances)]
@@ -131,7 +131,7 @@ class Graph:
                             heappush(heap, (u, next_cost, path))
 
         print("No path found.")
-        return [A]
+        return []
 
 
 def optimize(A, B, preferences, debug=False):
