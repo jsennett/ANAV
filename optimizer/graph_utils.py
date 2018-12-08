@@ -4,8 +4,9 @@ import json
 import numpy as np
 from geographiclib.geodesic import Geodesic
 
-import cost_utils
 sys.path.append("..")
+from optimizer import cost_utils
+
 from data.database_utils import nearest_node, edges_within_radius
 from data.config import credentials
 

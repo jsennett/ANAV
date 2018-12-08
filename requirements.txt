@@ -1,6 +1,7 @@
 Flask==1.0.2
 Flask-Cors==3.0.6
 geographiclib==1.49
+geopy==1.18.0
 heapdict==1.0.0
 Jinja2==2.10
 lxml==4.2.5
