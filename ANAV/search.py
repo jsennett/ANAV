@@ -33,28 +33,22 @@ def search():
 		print("highway_val=",highway_val)
 		print("residential_val=",residential_val)
 
-
-		#f = request.form['flatness_range']
 		error = None
 
-		if CurPos is None:
-			error = 'Current Pisition is required.'
-		elif Destination is None:
-			error = 'Destination is required.'
-		else:
-			error = None
+		if CurPos is None or Destination is None:
+			flash("Current position or destination cannot be blank.")
+			return render_template('search.html', Destinationtext = Destination, CurPostext = CurPos, length = 0, route = [])
 
 		if error is None:
+
 			# Execute the search operation
-			#print('CurPos = ' + CurPos )
-			#print('Destination =' + Destination )
 			geolocator = Nominatim(user_agent="bikemap")
 			CurPos_location = geolocator.geocode(CurPos)
 			Destination_location = geolocator.geocode(Destination)
 
 			if Destination_location is None or CurPos_location is None:
-				return render_template('routenotfound.html')
-
+				flash("Current position or destination was not found. Please provide a full, valid address.")
+				return render_template('search.html', Destinationtext = Destination, CurPostext = CurPos, length = 0, route = [])
 
 			print("Finding the shortest route from " )
 			print(CurPos_location.latitude,CurPos_location.longitude)
@@ -62,15 +56,19 @@ def search():
 			print(Destination_location.latitude, Destination_location.longitude)
 
 			# Get Optimized route from the optimizer
-			#route = graph_utils.optimize(CurPos_location.latitude,CurPos_location.longitude,
-			#					 Destination_location.latitude, Destination_location.longitude)
+			A = (CurPos_location.latitude, CurPos_location.longitude)
+			B = (Destination_location.latitude, Destination_location.longitude)
+			preferences = (flatness_val, bicycle_val, distance_val, 
+							motorway_val, highway_val, residential_val)
 
+			route = graph_utils.optimize(A, B, preferences, debug=True)
+			length = len(route)
 
-			route = get_route(CurPos_location.latitude,CurPos_location.longitude, Destination_location.latitude, Destination_location.longitude)
-			
-			length = len(route);
-			
-			return render_template('search.html',Destinationtext = Destination, CurPostext = CurPos, length = length, route = route)
+			if length == 0:
+				flash("No route found. Please try a different starting position or end destination.")
+				return render_template('search.html', Destinationtext = Destination, CurPostext = CurPos, length = 0, route = [])
+			else:
+				return render_template('search.html',Destinationtext = Destination, CurPostext = CurPos, length = length, route = route)
 
 		flash(error);
 	return render_template('search.html')
