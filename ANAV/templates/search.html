@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="styles.css">
     <meta charset="utf-8">
     <title>ANAV</title>
     <style>
@@ -16,7 +17,6 @@
         margin: 0;
         padding: 0;
       }
-
       ul {
           list-style-type: none;
           margin: 0;
@@ -30,6 +30,7 @@
       }
       li a {
           display: block;
+          width: 60px;
           color: white;
           text-align: center;
           padding: 14px 16px;
@@ -38,6 +39,29 @@
       li a:hover {
           background-color: #111;
       }
+
+      .header ul{
+
+        height: 325px;
+        margin: none;
+        font-family: BebasNeueBook, Helvetica, Arial;
+        height: inherit;
+        background-color: #474a4f;
+        color: white;
+        padding-left: 10px;
+        text-align: center;
+        font-size: 32px;
+      }
+
+      .header h2{
+        padding-left: 10px;
+        padding-top: 60px;
+        padding-bottom: 0px;
+        margin-bottom: 0px;
+
+
+      }
+
 
       fieldset{
             background-color: #fff;
@@ -50,14 +74,16 @@
       
     </style>
   </head>
-
-
-  <img src="ANAV/static/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
-
-
-  <h3>ANAV: A* Navigation for cyclists with tired legs</h1>
-
-
+<div class = "header">
+  <ul>
+      <li>
+        <img src="logos/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
+      </li>
+      <li>
+        <h2>ANAV: A* Navigation for Cyclists with Tired Legs</h3>
+      </li>
+  </ul>
+</div>
   <body>
     <form method="post">
       <label for="CurPos">Current Position</label>
