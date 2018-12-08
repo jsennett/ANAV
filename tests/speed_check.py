@@ -21,13 +21,11 @@ def time_radius_queries():
         print("*****" , name , "*****")
 
         # Test different radii
-        for degrees in [.01, .05, .1, .15, .2, .3, .4, .5]:
-            radius = degrees * 111000
+        for meters in [1000 * x for x in range(50)]:
             start = time.time()
-            nodes = edges_within_radius(credentials, radius=radius, lat=lat, lon=lon, limit=5000000)
+            edges = edges_within_radius(credentials, radius=meters, lat=lat, lon=lon, limit=5000000)
             end = time.time()
-            print("%d nodes found in %f sec (radius %fm)" %
-                  (len(nodes), end - start, radius ))
+            print("%d, %f, %d" % (len(edges), end - start, meters))
 
 
 def time_nearest_node_queries():
@@ -46,6 +44,24 @@ def time_nearest_node_queries():
         nodes = nearest_node(credentials, lat=lat, lon=lon)
         end = time.time()
         print("%s: nearest node found in %f sec" % (name, end - start))
+
+def time_random_nearest_nodes():
+
+    x_dim = 100
+    y_dim = 50
+    count = 0
+
+    for i in range(x_dim):
+        for j in range(y_dim):
+
+            lon = -73.2 + (-71.5 - -73.2) * 1.0 * i /x_dim
+            lat = 42.1 + (42.6 - 42.1) * 1.0 * j /y_dim
+
+            count += 1
+            start = time.time()
+            nodes = nearest_node(credentials, lat=lat, lon=lon)
+            end = time.time()
+            print("%i, %f, %f, %f" % (count, lat, lon, end - start))
 
 
 def time_nearest_node_not_found():
@@ -88,4 +104,5 @@ if __name__ == '__main__':
     # time_radius_queries()
     # time_nearest_node_queries()
     # time_optimize()
-    time_nearest_node_not_found()
+    # time_nearest_node_not_found()
+    time_random_nearest_nodes()
