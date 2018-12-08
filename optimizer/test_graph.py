@@ -2,7 +2,6 @@ from graph_utils import *
 import json
 from time import time
 from pprint import pprint
-import amherst
 from decimal import Decimal
 
 def test_graph():
@@ -128,4 +127,4 @@ if __name__ == '__main__':
     # test_medium_path("../data/nodes.txt", "../data/edges.txt")
 
     # g.calculate_costs()
-    optimize((Decimal('42.2801886'), Decimal('-72.6036306')), (Decimal('42.3089309'), Decimal('-72.6258168')), (0.5, 0.5, 0.5, 0.5, 0.5, 0.5), debug =True)
+    optimize((Decimal('42.357402'), Decimal('-71.1147241')), (Decimal('42.357402'), Decimal('-71.1147241')), (0.5, 0.5, 0.5, 0.5, 0.5, 0.5), debug =True)

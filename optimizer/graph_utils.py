@@ -69,10 +69,12 @@ class Graph:
 
                 # In A*, we return the shortest path once we find B, even if
                 # we have not fully explored all of the remaining neighbors.
+                print("#############")
+                print('v in adjlist:', self.adjacencyList.get(v))
+                print("#############")
                 if use_a_star and v == B:
                     return [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
 
-                if debug: print('v in adjlist:', self.adjacencyList.get(v))
 
                 # A* uses heuristics (like Euclidean Distance) to prioritize
                 # which nodes to explore. Sort neighbors by
@@ -266,7 +268,10 @@ def search_radius(s, t):
     # For a large search radius, we can't afford a large buffer;
     # the graph will have too many edges which is expensive to
     # retrieve and slow to find optimal route.
-    if st_dist < 5000:
+    if st_dist < 100:
+        st_dist = 1000
+        buffer = .5
+    elif st_dist < 5000:
         buffer = .5
     elif 5000 <= st_dist < 10000:
         buffer = .25
