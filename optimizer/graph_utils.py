@@ -74,7 +74,9 @@ class Graph:
                 print('v in adjlist:', self.adjacencyList.get(v))
                 print("#############")
                 if use_a_star and v == B:
-                    return [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
+                    final_path = [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
+                    print(final_path)
+                    return final_path
 
 
                 # A* uses heuristics (like Euclidean Distance) to prioritize
@@ -114,6 +116,7 @@ class Graph:
                         print("Shortest path found!")
                         # for p in path: print(p)
                         formatted_path = [(self.nodes[nodeid][0:2]) for nodeid in path]
+                        print(formatted_path)
 
                         return formatted_path
                     if u in visited: continue
@@ -224,8 +227,9 @@ def optimize(A, B, preferences, debug=False):
 
     shortest_path = g.dijkstra_path(s_id, t_id)
 
-    print("shortest_path found:")
-    print(shortest_path)
+    if debug:
+        print("shortest_path found:")
+        print(shortest_path)
 
     return shortest_path
 
