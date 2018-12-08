@@ -4,6 +4,7 @@ import json
 import numpy as np
 from geographiclib.geodesic import Geodesic
 
+import cost_utils
 sys.path.append("..")
 from data.database_utils import nearest_node, edges_within_radius
 from data.config import credentials
@@ -17,14 +18,13 @@ MAX_DISTANCE = 50000
 
 class Node:
 
-    def __init__(self, name, coord, elev):
-        self.name = name
+    def __init__(self, id, coord):
+        self.id = id
         self.lat = coord[0]
         self.lon = coord[1]
-        self.elev = elev
 
     def __repr__(self):
-        return "\n Node %s: (%i, %i), %im" % (self.name, self.lat, self.lon, self.elev)
+        return "\n Node %s: (%i, %i)" % (self.id, self.lat, self.lon)
 
 
 class Graph:
@@ -32,35 +32,19 @@ class Graph:
     def __init__(self):
         self.nodes = {}
         self.adjacencyList = {}
+        self.cost = {}
 
 
     def add_node(self, node):
         assert(node not in self.nodes)
-        self.nodes[node.name] = (node.lat, node.lon, node.elev)
-        self.adjacencyList[node.name] = []
+        self.nodes[node.id] = (node.lat, node.lon)
+        self.adjacencyList[node.id] = []
+        self.cost[node.id] = inf
 
-
-    def add_edge(self, A_name, B_name):
-        """
-        Convert names 'A' to 'B' to points our functions can use, then
-        add an edge from A to B with weight equal to the distance.
-        """
-        # Get nodes from node names
-        A_fields = self.nodes.get(A_name)
-        B_fields = self.nodes.get(B_name)
-
-        # Convert to expected dictionaries
-        A = {'lat':A_fields[0],
-                  'lon':A_fields[1],
-                  'elev':A_fields[2]}
-
-        B = {'lat':B_fields[0],
-                  'lon':B_fields[1],
-                  'elev':B_fields[2]}
-
+    def add_edge(self, A_id, B_id, distance, highway, bicycle, incline, preferences):
         # Calculate edge weights
-        cost_to_B = preprocess_utils.cost(A, B)
-        self.adjacencyList[A_name].append((B_name, cost_to_B))
+        cost_to_B = cost_utils.cost(distance, highway, bicycle, incline, preferences)
+        self.adjacencyList[A_id].append((B_id, cost_to_B))
 
 
     def dijkstra_path(self, A, B, use_a_star=True, debug=False):
@@ -69,15 +53,14 @@ class Graph:
         if debug: print("nodes:", self.nodes)
 
         # Initial values
-        cost = { V: inf for V in self.nodes.keys() }
-        cost[A] = 0
+        self.cost[A] = 0
         visited = set()
 
-        # [(node, cost, path), ...]
-        heap = [(A, cost[A], [])]
+        # [(cost, node id, path), ...]
+        heap = [(A, self.cost[A], [])]
 
         # Dijkstra's
-        while len(heap) > 0:
+        while heap:
 
             (v, vcost, path) = heappop(heap)
             if v not in visited:
@@ -97,6 +80,7 @@ class Graph:
                 # iterate over the sorted elements.
                 # Sort based on minimum cost.
 
+                ######rework needed, should be weight + L2 distance
                 # Instead of sorting by weight, sort by L2 distance.
                 neighbors = [neighbor for neighbor in self.adjacencyList.get(v)]
 
@@ -114,7 +98,12 @@ class Graph:
                     if debug: print("checking sorted neighbors:", sorted_neighbors)
                 else:
                     if debug: print("checking unsorted neighbors:", sorted_neighbors)
+
                 for (u, ucost, udist) in sorted_neighbors:
+                    print("########")
+                    print(ucost, u, udist)
+                    print("########")
+                    ####### may not be corrected one
                     if u == B:
                         if debug: print("paths searched:", onsidered)
                         # TODO: make sure this is returning at the right time.
@@ -125,13 +114,15 @@ class Graph:
 
                         return formatted_path
                     if u in visited: continue
-                    prev_cost = cost.get(u)
+                    prev_cost = self.cost.get(u)
                     next_cost = vcost + ucost
                     # Update cost, if taking this path is optimal
                     if next_cost < prev_cost:
-                        cost[u] = next_cost
+                        self.cost[u] = next_cost
                         if debug: print((heap, (u, next_cost, path)))
-                        heappush(heap, (u, next_cost, path))
+                        ###### only heappush if it is not in the heap
+                        if (u, prev_cost, path) not in heap:
+                            heappush(heap, (u, next_cost, path))
 
         print("No path found.")
         return [A]
@@ -154,8 +145,6 @@ def optimize(A, B, preferences, debug=False):
     # Unpack values
     A_lat, A_lon = A
     B_lat, B_lon = B
-    (flatness_val, bicycle_val, distance_val,
-    motorway_val, highway_val, residential_val) = preferences
 
     # Validate input parameters
     if not valid_point(A_lat, A_lon):
@@ -211,9 +200,33 @@ def optimize(A, B, preferences, debug=False):
         print("preferences:", preferences)
 
     # TODO: build the graph g, call g.dijkstra_path, and return the shortest path
-    # g = Graph()
-    # shortest_path = g.dijkstra_path(s, t))
-    # return shortest_path
+    g = Graph()
+
+    for way in edges_to_search:
+        start_node_id = way[0]
+        if(g.nodes.get(start_node_id)==None):
+            start_node_lat = way[1]
+            start_node_lon = way[2]
+            g.add_node(Node(start_node_id, (start_node_lat, start_node_lon))) #add start node to graph
+        end_node_id = way[3]
+        if(g.nodes.get(end_node_id)==None):
+            end_node_lat = way[4]
+            end_node_lon = way[5]
+            g.add_node(Node(end_node_id, (end_node_lat, end_node_lon))) #add end node to graph, for closest_node() method
+        distance = way[6]
+        highway = way[7]
+        bicycle = way[8]
+        incline = way[9]
+        g.add_edge(start_node_id, end_node_id, distance, highway, bicycle, incline, preferences)
+
+    shortest_path = g.dijkstra_path(s_id, t_id)
+
+    print("shortest_path found:")
+    print(shortest_path)
+
+    return shortest_path
+
+
 
 
 def midpoint(s, t):
