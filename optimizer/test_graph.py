@@ -127,4 +127,4 @@ if __name__ == '__main__':
     # test_medium_path("../data/nodes.txt", "../data/edges.txt")
 
     # g.calculate_costs()
-    optimize((Decimal('42.357402'), Decimal('-71.1147241')), (Decimal('42.357402'), Decimal('-71.1147241')), (0.5, 0.5, 0.5, 0.5, 0.5, 0.5), debug =True)
+    optimize((Decimal('42.357402'), Decimal('-71.1147241')), (Decimal('42.3544217'), Decimal('-71.1079546')), (0.5, 0.5, 0.5, 0.5, 0.5, 0.5), debug =True)
