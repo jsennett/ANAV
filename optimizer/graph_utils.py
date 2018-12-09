@@ -58,27 +58,24 @@ class Graph:
         visited = set()
 
         # [(cost, node id, path), ...]
-        heap = [(A, self.cost[A], [])]
+        heap = [(self.cost[A], A, [])]
 
         # Dijkstra's
         while heap:
 
-            (v, vcost, path) = heappop(heap)
+            (vcost, v, path) = heappop(heap)
             if v not in visited:
                 visited.add(v)
                 path = path + [v]
 
                 # In A*, we return the shortest path once we find B, even if
                 # we have not fully explored all of the remaining neighbors.
-                print("#############")
-                print('v in adjlist:', self.adjacencyList.get(v))
-                print("#############")
                 if use_a_star and v == B:
                     final_path = [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
                     print(final_path)
                     return final_path
 
-
+                if debug: print('v in adjlist:', self.adjacencyList.get(v))
                 # A* uses heuristics (like Euclidean Distance) to prioritize
                 # which nodes to explore. Sort neighbors by
                 # Instead of iterating over elements of adjlist.get(v),
@@ -87,28 +84,28 @@ class Graph:
 
                 ######rework needed, should be weight + L2 distance
                 # Instead of sorting by weight, sort by L2 distance.
-                neighbors = [neighbor for neighbor in self.adjacencyList.get(v, [])]
-
-                distances = [heuristic(self.nodes.get(B),
-                                             self.nodes.get(neighbor[0]))
-                             for neighbor in self.adjacencyList.get(v, [])]
-                neighbor_distances = [(neighbor[0], neighbor[1], distance)
-                                      for (neighbor, distance)
-                                      in zip(neighbors, distances)]
-
-                sorted_neighbors = sorted(neighbor_distances, key=lambda x:(x[int(use_a_star)]))
-                if debug: print(sorted_neighbors)
+                neighbors_array = self.adjacencyList.get(v, [])
+                neighbors = [neighbor for neighbor in neighbors_array]
+                distances = [float(heuristic(self.nodes.get(B),
+                                             self.nodes.get(neighbor[0]))) + neighbor[1]
+                             for neighbor in neighbors_array]
+                neighbor_distances = [(distance, neighbor[1], neighbor[0])
+                                      for (distance, neighbor)
+                                      in zip(distances, neighbors)]
+                neighbor_distances.sort()
+                sorted_neighbors = neighbor_distances
+                if debug: print("sorted_neighbors" ,sorted_neighbors)
 
                 if use_a_star:
                     if debug: print("checking sorted neighbors:", sorted_neighbors)
                 else:
                     if debug: print("checking unsorted neighbors:", sorted_neighbors)
 
-                for (u, ucost, udist) in sorted_neighbors:
-                    print("########")
-                    print(ucost, u, udist)
-                    print("########")
+                for (udist, ucost, u) in sorted_neighbors:
                     ####### may not be corrected one
+                    print("#############")
+                    print('(udist, ucost, u):', udist, ucost, u)
+                    print("#############")
                     if u == B:
                         if debug: print("paths searched:", onsidered)
                         # TODO: make sure this is returning at the right time.
@@ -127,8 +124,8 @@ class Graph:
                         self.cost[u] = next_cost
                         if debug: print((heap, (u, next_cost, path)))
                         ###### only heappush if it is not in the heap
-                        if (u, prev_cost, path) not in heap:
-                            heappush(heap, (u, next_cost, path))
+                        if (prev_cost, u, path) not in heap:
+                            heappush(heap, (next_cost, u, path))
 
         print("No path found.")
         return []
@@ -202,7 +199,7 @@ def optimize(A, B, preferences, debug=False):
         print("t:", t)
         print("AB_dist:", AB_dist)
         print("st_dist:", dist_2d((s_lat, s_lon), (t_lat, t_lon)))
-        print("sample edges:", edges_to_search[:10])
+        #print("sample edges:", edges_to_search[:10])
         print("preferences:", preferences)
 
     # TODO: build the graph g, call g.dijkstra_path, and return the shortest path
@@ -310,4 +307,4 @@ def valid_point(lat, lon):
 
 def heuristic(v, u):
     """ L2 distance of nodes (X, Y, )"""
-    return (v[0] - u[0])**2 + (v[1]-u[1])**2
+    return dist_2d(v, u)
