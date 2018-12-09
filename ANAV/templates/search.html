@@ -2,14 +2,14 @@
 <html>
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="static/style.css">
     <meta charset="utf-8">
     <title>ANAV</title>
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 90%;
+        height: 70%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -58,8 +58,6 @@
         padding-top: 60px;
         padding-bottom: 0px;
         margin-bottom: 0px;
-
-
       }
 
 
@@ -82,7 +80,7 @@
 <div class = "header">
   <ul>
       <li>
-        <img src="logos/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
+        <img src="static/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
       </li>
       <li>
         <h2>ANAV: A* Navigation for Cyclists with Tired Legs</h3>
@@ -138,10 +136,6 @@
 
     <div id="map"></div>
     <script>
-      // This example creates a 2-pixel-wide red polyline showing the path of
-      // the first trans-Pacific flight between Oakland, CA, and Brisbane,
-      // Australia which was made by Charles Kingsford Smith.
-
       function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 15,
