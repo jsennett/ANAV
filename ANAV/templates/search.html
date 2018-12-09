@@ -9,7 +9,8 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
-        height: 70%;
+        height: 100%;
+        width: 100%;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -140,9 +141,13 @@
     <div id="map"></div>
     <script>
       function initMap() {
+
+        var map_lat = parseFloat('{{lat}}');
+        var map_lon = parseFloat('{{lon}}');
+
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 15,
-          center: {lat: 42.397505, lng: -72.5218360757396},
+          center: {lat: map_lat, lng: map_lon},
           mapTypeId: 'terrain'
         });
 

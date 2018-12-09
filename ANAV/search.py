@@ -12,6 +12,15 @@ from flask import (
 
 bp = Blueprint('search', __name__, url_prefix='/')
 
+default_params = {
+	'Destinationtext': '', 
+	'CurPostext': '', 
+	'length': 0, 
+	'route': [],
+	'lat': 42.394021, 
+	'lon': -72.526652
+}
+
 @bp.route('/', methods=('GET', 'POST'))
 def search():
 	if request.method == 'POST':
@@ -37,7 +46,7 @@ def search():
 
 		if CurPos is None or Destination is None:
 			flash("Current position or destination cannot be blank.")
-			return render_template('search.html', Destinationtext = Destination, CurPostext = CurPos, length = 0, route = [])
+			return render_template('search.html', **default_params)
 
 		if error is None:
 
@@ -48,7 +57,7 @@ def search():
 
 			if Destination_location is None or CurPos_location is None:
 				flash("Current position or destination was not found. Please provide a full, valid address.")
-				return render_template('search.html', Destinationtext = Destination, CurPostext = CurPos, length = 0, route = [])
+				return render_template('search.html', **default_params)
 
 			print("Finding the shortest route from " )
 			print(CurPos_location.latitude,CurPos_location.longitude)
@@ -66,12 +75,18 @@ def search():
 
 			if length == 0:
 				flash("No route found. Please try a different starting position or end destination.")
-				return render_template('search.html', Destinationtext = Destination, CurPostext = CurPos, length = 0, route = [])
+				return render_template('search.html', **default_params)
 			else:
-				return render_template('search.html',Destinationtext = Destination, CurPostext = CurPos, length = length, route = route)
-
-		flash(error);
-	return render_template('search.html')
+				return render_template('search.html', 
+										Destinationtext = Destination, 
+										CurPostext = CurPos, 
+										length = length, 
+										route = route, 
+										lat=CurPos_location.latitude, 
+										lon=CurPos_location.longitude)
+		else:
+			flash(error);
+	return render_template('search.html', **default_params)
 
 
 def get_route(CurPos_latitude, CurPos_longtitude, Des_latitude, Des_longtitude):
