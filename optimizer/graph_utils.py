@@ -71,7 +71,9 @@ class Graph:
                 # In A*, we return the shortest path once we find B, even if
                 # we have not fully explored all of the remaining neighbors.
                 if use_a_star and v == B:
-                    return [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
+                    final_path = [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
+                    print(final_path)
+                    return final_path
 
                 if debug: print('v in adjlist:', self.adjacencyList.get(v))
                 # A* uses heuristics (like Euclidean Distance) to prioritize
@@ -111,6 +113,7 @@ class Graph:
                         print("Shortest path found!")
                         # for p in path: print(p)
                         formatted_path = [(self.nodes[nodeid][0:2]) for nodeid in path]
+                        print(formatted_path)
 
                         return formatted_path
                     if u in visited: continue
@@ -221,8 +224,9 @@ def optimize(A, B, preferences, debug=False):
 
     shortest_path = g.dijkstra_path(s_id, t_id)
 
-    print("shortest_path found:")
-    print(shortest_path)
+    if debug:
+        print("shortest_path found:")
+        print(shortest_path)
 
     return shortest_path
 
