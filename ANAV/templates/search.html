@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<<<<<<< HEAD
   <meta content="initial-scale=1.0, user-scalable=no" name="viewport">
   <link href="static/style.css" rel="stylesheet">
   <meta charset="utf-8">
@@ -335,10 +336,276 @@
            center: {lat: 42.397505, lng: -72.5218360757396},
            mapTypeId: 'terrain'
          });
+=======
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>ANAV</title>
+    <style>
+
+        #map {
+            height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        li {
+            display: inline;
+        }
+
+        li a {
+            display: inline-block;
+            width: 80px;
+            color: white;
+            text-align: center;
+            padding-left: 5px;
+            padding-right: 10px;
+            text-decoration: none;
+        }
+
+        li a:hover {
+            background-color: #111;
+        }
+
+        .header ul {
+
+            height: 325px;
+            display: block;
+            margin: 0px;
+            font-family: BebasNeueBook, Helvetica, Arial;
+            height: inherit;
+            background-color: #474a4f;
+            color: white;
+            padding-left: 10px;
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .header h2 {
+            padding-left: 10px;
+            padding-top: 60px;
+            padding-bottom: 0px;
+            margin-bottom: 0px;
+        }
+
+        fieldset {
+            background-color: #fff;
+            border: none;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            padding: 0 .625em;
+        }
+
+      .controls {
+        margin-top: 10px;
+        border: 1px solid transparent;
+        border-radius: 2px 0 0 2px;
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        height: 32px;
+        outline: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      #CurPos,
+      #Destination {
+        background-color: #fff;
+        font-family: Roboto;
+        font-size: 15px;
+        font-weight: 300;
+        margin-left: 12px;
+        padding: 0 11px 0 13px;
+        text-overflow: ellipsis;
+        width: 200px;
+      }
+
+      #CurPos:focus,
+      #Destination:focus {
+        border-color: #4d90fe;
+      }
+
+      #mode-selector {
+        color: #fff;
+        background-color: #4d90fe;
+        margin-left: 12px;
+        padding: 5px 11px 0px 11px;
+      }
+
+      #mode-selector label {
+        font-family: Roboto;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+            integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+            crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+</head>
+<div class="header">
+    <ul>
+        <li>
+            <img src="static/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
+        </li>
+        <li>
+            <h2>ANAV: A* Navigation for Cyclists with Tired Legs</h2>
+        </li>
+    </ul>
+</div>
+<body>
+<!--  Start Navigation Form -->
+<br>
+<form method="post">
+    <input id="CurPos" name="CurPos" class="controls" type="text" placeholder="Origin location" value = '{{ CurPostext }}' required>
+    <input id="Destination" name="Destination" class="controls" type="text" placeholder="Destination location" value = '{{ Destinationtext }}' required>
+
+    <input type="submit" value="Search Path">
+    <fieldset>
+
+        <a>Flatness:</a><input type="range" name="flatness_range" id="flatness_range" min="0" max="100" step="5"
+                               onchange="flatness_val.value=this.value"/>
+        <output id="flatness_val" for="flatness_range">50</output>
+        <br>
+
+        <a>Bicycle Designation:</a> <input type="range" name="bicycle_range" id="bicycle_range" min="0" max="100"
+                                           step="5" onchange="bicycle_val.value=this.value"/>
+        <output id="bicycle_val" for="bicycle_range">50</output>
+        <br>
+
+        <a>Short Distance: </a><input type="range" name="distance_range" id="distance_range" min="0" max="100" step="5"
+                                      onchange="distance_val.value=this.value"/>
+        <output id="distance_val" for="distance_range">50</output>
+        <br>
+
+    </fieldset>
+
+    <fieldset>
+
+        <a>Motorway:</a><input type="range" name="motorway_range" id="motorway_range" min="0" max="100" step="5"
+                               onchange="motorway_val.value=this.value"/>
+        <output id="motorway_val" for="motorway_range">50</output>
+        <br>
+
+        <a>Primary Highway:</a> <input type="range" name="highway_range" id="highway_range" min="0" max="100" step="5"
+                                       onchange="highway_val.value=this.value"/>
+        <output id="highway_val" for="highway_range">50</output>
+        <br>
+
+        <a>Residential Roads: </a><input type="range" name="residential_range" id="residential_range" min="0" max="100"
+                                         step="5" onchange="residential_val.value=this.value"/>
+        <output id="residential_val" for="residential_range">50</output>
+        <br>
+
+    </fieldset>
+
+</form>
+<br>
+<!--  End Navigation Form -->
+
+{% block content %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning alert-dismissible">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        {% block page_content %}{% endblock %}
+    </div>
+{% endblock %}
+
+<div id="map"></div>
+
+<script>
+    function initMap() {
+
+        var map_lat = parseFloat('{{lat}}');
+        var map_lon = parseFloat('{{lon}}');
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 13,
+          center: {lat: map_lat, lng: map_lon},
+          mapTypeId: 'terrain'
+        });
+
+        var bikeLayer = new google.maps.BicyclingLayer();
+        bikeLayer.setMap(map);
+
+
+        var num = parseInt('{{length}}');
+
+        var flightPlanCoordinates = [
+            {% for point in route %}
+                {lat: {{point[0]}}, lng: {{point[1]}}},
+            {% endfor %}
+        ];
+
+        var flightPath = new google.maps.Polyline({
+            path: flightPlanCoordinates,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+        });
+
+        flightPath.setMap(map);
+
+        new AutocompleteDirectionsHandler(flightPath);
+
+    }
+
+    function AutocompleteDirectionsHandler(map) {
+        this.map = map;
+        this.originPlaceId = null;
+        this.destinationPlaceId = null;
+
+        var originInput = document.getElementById('CurPos');
+        var destinationInput = document.getElementById('Destination');
+
+        var originAutocomplete = new google.maps.places.Autocomplete(
+            originInput, {placeIdOnly: true});
+
+        var destinationAutocomplete = new google.maps.places.Autocomplete(
+            destinationInput, {placeIdOnly: true});
+
+        this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+        this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+
+      }
+
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-Kk-3VfS7utO30Z1_XsSOXRwT6g745NQ&libraries=places,drawing&callback=initMap" async defer>
+</script>
+</body>
+>>>>>>> b67ce90ac7e1e36bb58abae6ed84957e68c8748b
 
          var bikeLayer = new google.maps.BicyclingLayer();
          bikeLayer.setMap(map);
 
+<<<<<<< HEAD
+=======
+<ul>
+    <li><a class="active" href="index.html">Navigation</a></li>
+    <li><a href="about.html">About</a></li>
+</ul>
+>>>>>>> b67ce90ac7e1e36bb58abae6ed84957e68c8748b
 
          var num = parseInt('{{length}}'); 
          var flightPlanCoordinates = [
