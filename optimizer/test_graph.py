@@ -1,4 +1,4 @@
-from graph_utils import *
+from optimizer.graph_utils import *
 import json
 from time import time
 from pprint import pprint

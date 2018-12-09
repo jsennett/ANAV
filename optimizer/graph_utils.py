@@ -49,6 +49,9 @@ class Graph:
 
 
     def dijkstra_path(self, A, B, use_a_star=True, debug=False):
+        print("A", A)
+        print("B", B)
+        print()
         """ Return the shortest path from A to B using Dijkstra algo """
 
         if debug: print("nodes:", self.nodes)

@@ -2,7 +2,7 @@ import xml.etree.ElementTree as etree
 import json
 import psycopg2
 from psycopg2.extras import execute_values
-import data_ingestion_utils
+from data import data_ingestion_utils
 
 
 def parse_nodes(filename, credentials):

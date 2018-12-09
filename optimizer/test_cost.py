@@ -1,4 +1,4 @@
-from cost_utils import *
+from optimizer.cost_utils import *
 
 
 def test_cost(A, B):
