@@ -29,7 +29,7 @@ def search():
 
 		flatness_val = float(request.form['flatness_range'])/100
 		bicycle_val = float(request.form['bicycle_range'])/100
-		distance_val = float(request.form['distance_range'])/100
+		distance_val = 1
 		
 		motorway_val = float(request.form['motorway_range'])/100
 		highway_val = float(request.form['highway_range'])/100
