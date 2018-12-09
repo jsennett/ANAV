@@ -1,183 +1,372 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="static/style.css">
-    <meta charset="utf-8">
-    <title>ANAV</title>
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-        height: 70%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      ul {
-          list-style-type: none;
-          margin: 0;
-          padding: 0;
-          overflow: hidden;
-          background-color: #333;
-      }
+<head>
+  <meta content="initial-scale=1.0, user-scalable=no" name="viewport">
+  <link href="static/style.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <title>ANAV</title>
+  <style>
+       /* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+     #map {
+       height: 100%;
+     }
+     /* Optional: Makes the sample page fill the window. */
+     html, body {
+       height: 100%;
+       margin: 0;
+       padding: 0;
 
-      li {
-          float: left;
-      }
-      li a {
-          display: block-inline;
-          width: 60px;
-          color: white;
-          text-align: center;
-          padding-left: 5px;
-          padding-right: 10px;
-          text-decoration: none;
-      }
-      li a:hover {
-          background-color: #111;
-      }
+     }
+     ul {
+         list-style-type: none;
+         margin: 0;
+         padding: 0;
+         overflow: hidden;
+         background-color: #333;
+     }
 
-      .header ul{
+     li {
+         float: left;
+     }
+     li a {
+         display: block-inline;
+         
+         color: white;
+         text-align: center;
+         padding-left: 0px;
+         padding-right: 10px;
+         text-decoration: none;
+     }
+     li a:hover {
+         background-color: #111;
+     }
 
-        height: 325px;
-        display: block;
-        margin: none;
-        font-family: BebasNeueBook, Helvetica, Arial;
-        height: inherit;
-        background-color: #474a4f;
-        color: white;
-        padding-left: 10px;
-        text-align: center;
-        font-size: 32px;
-      }
+     .header ul{
 
-
-      .header h2{
-        padding-left: 10px;
-        padding-top: 60px;
-        padding-bottom: 0px;
-        margin-bottom: 0px;
-      }
+       height: 10%;
+       width: 100%;
+       display: block;
+       margin: none;
+       font-family: BebasNeueBook, Helvetica, Arial;
+       height: inherit;
+       background-color: #474a4f;
+       color: white;
+       padding-left: 10px;
+       text-align: center;
+       font-size: 32px;
+     }
 
 
-      fieldset{
-            background-color: #fff;
-            border: none;
-            border-radius: 2px;
-            margin-bottom: 12px;
-            overflow: hidden;
-            padding: 0 .625em;
-      }
-      
-    </style>
+     .header h2{
+       width: 100%;
+       padding-left: 10px;
+       padding-top: 60px;
+       padding-bottom: 0px;
+       margin-bottom: 0px;
+     }
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-  </head>
-<div class = "header">
-  <ul>
+     fieldset{
+           background-color: #fff;
+           border: none;
+           border-radius: 2px;
+           margin-bottom: 12px;
+           overflow: hidden;
+           padding: 0 .625em;
+     }
+
+
+     .DeSet {
+       margin-left: 5px;
+     }
+
+     /* Style The Dropdown Button */
+     .dropbtn {
+       background-color: #474a4f;
+       color: white;
+       padding: 5px;
+       font-size: 20px;
+       border: none;
+       cursor: pointer;
+       margin-left: 0px;
+       margin-bottom: 5px;
+     }
+
+     /* The container <div> - needed to position the dropdown content */
+     .dropdown {
+       position: relative;
+       display: inline-block;
+       margin-left: 20px;
+       width:150px;
+
+     }
+
+     /* Dropdown Content (Hidden by Default) */
+     .dropdown-content {
+       display: none;
+       position: absolute;
+       background-color: #f9f9f9;
+       width: 480px;
+       box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+       z-index: 1;
+       padding-left: 20px;
+     }
+
+     /* Links inside the dropdown */
+     .dropdown-content a {
+       color: black;
+       
+       text-decoration: none;
+       display: block;
+     }
+     .dropdown-content label {
+      padding-right: 5px;
+     }
+
+     /* Change color of dropdown links on hover */
+     
+     /* Show the dropdown menu on hover */
+     .dropdown:hover .dropdown-content {
+       display: block;
+     }
+
+     /* Change the background color of the dropdown button when the dropdown content is shown */
+     
+    /* On mouse-over, add a grey background color */
+    .container:hover input ~ .checkmark {
+     background-color: #ccc;
+    }
+
+    /* When the radio button is checked, add a blue background */
+    .container input:checked ~ .checkmark {
+     background-color: #2196F3;
+    }
+    .rowPow{
+      padding-left: 0px;
+    }
+    /* Create the indicator (the dot/circle - hidden when not checked) */
+    .checkmark:after {
+     content: "";
+     position: absolute;
+     display: none;
+    }
+
+    /* Show the indicator (dot/circle) when checked */
+    .container input:checked ~ .checkmark:after {
+     display: block;
+    }
+
+    /* Style the indicator (dot/circle) */
+    .container .checkmark:after {
+     top: 9px;
+     left: 9px;
+     width: 8px;
+     height: 8px;
+     border-radius: 0%;
+     background: white;
+    }
+
+  </style>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js">
+  </script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+  </script>
+</head>
+<body>
+  <div class="header">
+    <ul>
+      <li><img alt="A*Nav Logo" src="static/logo.png" style="width:150px;height:150px;"></li>
       <li>
-        <img src="static/logo.png" alt="A*Nav Logo" style="width:150px;height:150px;">
+        <h2>ANAV: A* Navigation for Cyclists with Tired Legs</h2>
       </li>
-      <li>
-        <h2>ANAV: A* Navigation for Cyclists with Tired Legs</h3>
-      </li>
-  </ul>
-</div>
-  <body>
+    </ul>
+  </div>
+  <div class="DeSet">
     <form method="post">
-      <label for="CurPos">Current Position</label>
-      <input type="text" name="CurPos" id="CurPos" value = '{{CurPostext}}' required>
-      <label for="Destination">Destination</label>
-      <input type="text" name="Destination" id="Destination"  value = '{{Destinationtext}}' required>
-      <input type="submit" value="Search Path">
-      <fieldset><br>
-
-        <a>Flatness:</a><input type="range" name="flatness_range" id="flatness_range" min="0" max="100" step="5" onchange="flatness_val.value=this.value"/>
-        <output id="flatness_val" for="flatness_range" >50</output><br>
-
-        <a>Bicycle Designation:</a> <input type="range" name="bicycle_range" id="bicycle_range" min="0" max="100" step="5" onchange="bicycle_val.value=this.value"/>
-        <output id="bicycle_val" for="bicycle_range" >50</output><br>
-
-        <a>Short Distance: </a><input type="range" name="distance_range" id="distance_range" min="0" max="100" step="5" onchange="distance_val.value=this.value"/>
-        <output id="distance_val" for="distance_range" >50</output><br>
-
-      </fieldset>
-
-      <fieldset>
-
-        <a>Motorway:</a><input type="range" name="motorway_range" id="motorway_range" min="0" max="100" step="5" onchange="motorway_val.value=this.value"/>
-        <output id="motorway_val" for="motorway_range" >50</output><br>
-
-        <a>Primary Highway:</a> <input type="range" name="highway_range" id="highway_range" min="0" max="100" step="5" onchange="highway_val.value=this.value"/>
-        <output id="highway_val" for="highway_range" >50</output><br>
-
-        <a>Residential Roads: </a><input type="range" name="residential_range" id="residential_range" min="0" max="100" step="5" onchange="residential_val.value=this.value"/>
-        <output id="residential_val" for="residential_range" >50</output><br>
-
-      </fieldset>
-      
+      <label for="CurPos">Current Position</label> <input id="CurPos" name="CurPos" required="" type="text" value='{{CurPostext}}'> <label for="Destination">Destination</label> <input id="Destination" name="Destination" required="" type="text" value='{{Destinationtext}}'> <input type="submit" value="Search Path">
     </form>
-    
-    {% block content %}
-    <div class="container">
-      {% for message in get_flashed_messages() %}
-      <div class="alert alert-warning alert-dismissible">
-        {{ message }}
+  </div>
+  <div class="row">
+    <div class="dropdown">
+      <button class="dropbtn">Terrain Settings</button>
+      <div class="dropdown-content">
+        <fieldset id = "group1">
+          <a><b>Flatness Select:</b></a>
+          <div class = "rowPow">
+            <label>No Preference
+              <input type="radio" name="group1">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>More Flat
+              <input type="radio" name="group1">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Most Flat
+              <input type="radio" name="group1">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </fieldset>
+
+          <!-- Old Flat Slider Code! -->
+
+          <!-- 
+          <a>Flatness:</a><input id="flatness_range" max="100" min="0" name="flatness_range" onchange="flatness_val.value=this.value" step="5" type="range"> <output for="flatness_range" id="flatness_val">50</output>
+          -->
+        <fieldset id ="group2">
+          <a><b>Bike Lane Preference:</b></a>
+          <div class = "rowPow">
+            <label>No Preference
+              <input type="radio" name="group2">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Prefer Lanes
+              <input type="radio" name="group2">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Prioritize Lanes
+              <input type="radio" name="group2">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </fieldset>
+
+          <!-- Old Bike Designation Slider! -->
+
+          <!--
+          <a>Bicycle Designation:</a> <input id="bicycle_range" max="100" min="0" name="bicycle_range" onchange="bicycle_val.value=this.value" step="5" type="range"> <output for="bicycle_range" id="bicycle_val">50</output><br>
+        -->
+
+          <!--
+          <a>Short Distance:</a> <input id="distance_range" max="100" min="0" name="distance_range" onchange="distance_val.value=this.value" step="5" type="range"> <output for="distance_range" id="distance_val">50</output><br>-->
+        </fieldset>
       </div>
-      {% endfor %}
-
-      {% block page_content %}{% endblock%}
     </div>
-    {% endblock %}
+    <div class="dropdown">
+      <button class="dropbtn">Road Settings</button>
+      <div class="dropdown-content">
+        <fieldset id = "group3">
+          <a><b>Motorway Preference:</b></a>
+          <div class = "rowPow">
+            <label>No Preference
+              <input type="radio" name="group3">
+              <span class="checkmark"></span>
+            </label>
 
-    <div id="map"></div>
-    <script>
-      function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 15,
-          center: {lat: 42.397505, lng: -72.5218360757396},
-          mapTypeId: 'terrain'
-        });
+            <label>Prefer Motorways
+              <input type="radio" name="group3">
+              <span class="checkmark"></span>
+            </label>
 
-        var bikeLayer = new google.maps.BicyclingLayer();
-        bikeLayer.setMap(map);
+            <label>Prioritize Motorways
+              <input type="radio" name="group3">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </fieldset>
+          <!--
+          <a>Motorway:</a><input id="motorway_range" max="100" min="0" name="motorway_range" onchange="motorway_val.value=this.value" step="5" type="range"> <output for="motorway_range" id="motorway_val">50</output><br>-->
+        <fieldset id = "group4">
+          <a><b>Highway Preference:</b></a>
+          <div class = "rowPow">
+            <label>No Preference
+              <input type="radio" name="group4">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Prefer Highways
+              <input type="radio" name="group4">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Prioritize Highways
+              <input type="radio" name="group4">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </fieldset>
+          <!--
+          <a>Primary Highway:</a> <input id="highway_range" max="100" min="0" name="highway_range" onchange="highway_val.value=this.value" step="5" type="range"> <output for="highway_range" id="highway_val">50</output><br>
+          -->
+          <fieldset id = "group5">
+          <a><b>Residential Road Preference:</b></a>
+          <div class = "rowPow">
+            <label>No Preference
+              <input type="radio" name="group5">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Prefer Residential
+              <input type="radio" name="group5">
+              <span class="checkmark"></span>
+            </label>
+
+            <label>Prioritize Residential
+              <input type="radio" name="group5">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </fieldset>
+
+          <!--
+          <a>Residential Roads:</a> <input id="residential_range" max="100" min="0" name="residential_range" onchange="residential_val.value=this.value" step="5" type="range"> <output for="residential_range" id="residential_val">50</output><br>
+        -->
+        </fieldset>
+      </div>
+    </div>
+  </div>{% block content %}
+  <div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning alert-dismissible">
+      {{ message }}
+    </div>{% endfor %} {% block page_content %}{% endblock%}
+  </div>{% endblock %}
+  <div id="map"></div>
+  <script>
+       function initMap() {
+         var map = new google.maps.Map(document.getElementById('map'), {
+           zoom: 15,
+           center: {lat: 42.397505, lng: -72.5218360757396},
+           mapTypeId: 'terrain'
+         });
+
+         var bikeLayer = new google.maps.BicyclingLayer();
+         bikeLayer.setMap(map);
 
 
-        var num = parseInt('{{length}}'); 
-        var flightPlanCoordinates = [
-        {% for point in route %}
-          {lat: {{point[0]}}, lng: {{point[1]}}},
-        {% endfor %}
-        ];
-        
-        var flightPath = new google.maps.Polyline({
-          path: flightPlanCoordinates,
-          geodesic: true,
-          strokeColor: '#FF0000',
-          strokeOpacity: 1.0,
-          strokeWeight: 2
-        });
+         var num = parseInt('{{length}}'); 
+         var flightPlanCoordinates = [
+         {% for point in route %}
+           {lat: {{point[0]}}, lng: {{point[1]}}},
+         {% endfor %}
+         ];
+         
+         var flightPath = new google.maps.Polyline({
+           path: flightPlanCoordinates,
+           geodesic: true,
+           strokeColor: '#FF0000',
+           strokeOpacity: 1.0,
+           strokeWeight: 2
+         });
 
-        flightPath.setMap(map);
-      }
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-Kk-3VfS7utO30Z1_XsSOXRwT6g745NQ&callback=initMap">
-    </script>
-  </body>
-
-
+         flightPath.setMap(map);
+       }
+  </script> 
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-Kk-3VfS7utO30Z1_XsSOXRwT6g745NQ&callback=initMap">
+  </script>
   <ul>
-    <li><a class="active" href="index.html">Navigation</a></li>
-    <li><a href="about.html">About</a></li>
+    <li>
+      <a class="active" href="index.html">Navigation</a>
+    </li>
+    <li>
+      <a href="about.html">About</a>
+    </li>
   </ul>
-
-
+</body>
 </html>
