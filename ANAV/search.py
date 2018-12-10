@@ -13,11 +13,11 @@ from flask import (
 bp = Blueprint('search', __name__, url_prefix='/')
 
 default_params = {
-	'Destinationtext': '', 
-	'CurPostext': '', 
-	'length': 0, 
+	'Destinationtext': '',
+	'CurPostext': '',
+	'length': 0,
 	'route': [],
-	'lat': 42.394021, 
+	'lat': 42.394021,
 	'lon': -72.526652
 }
 
@@ -30,7 +30,7 @@ def search():
 		flatness_val = float(request.form['flatness_range'])/100
 		bicycle_val = float(request.form['bicycle_range'])/100
 		distance_val = float(request.form['distance_range'])/100
-		
+
 		motorway_val = float(request.form['motorway_range'])/100
 		highway_val = float(request.form['highway_range'])/100
 		residential_val = float(request.form['residential_range'])/100
@@ -55,6 +55,8 @@ def search():
 			CurPos_location = geolocator.geocode(CurPos)
 			Destination_location = geolocator.geocode(Destination)
 
+			print(CurPos_location, Destination_location)
+
 			if Destination_location is None or CurPos_location is None:
 				flash("Current position or destination was not found. Please provide a full, valid address.")
 				return render_template('search.html', **default_params)
@@ -67,7 +69,7 @@ def search():
 			# Get Optimized route from the optimizer
 			A = (CurPos_location.latitude, CurPos_location.longitude)
 			B = (Destination_location.latitude, Destination_location.longitude)
-			preferences = (flatness_val, bicycle_val, distance_val, 
+			preferences = (flatness_val, bicycle_val, distance_val,
 							motorway_val, highway_val, residential_val)
 
 			route = graph_utils.optimize(A, B, preferences, debug=True)
@@ -77,19 +79,13 @@ def search():
 				flash("No route found. Please try a different starting position or end destination.")
 				return render_template('search.html', **default_params)
 			else:
-				return render_template('search.html', 
-										Destinationtext = Destination, 
-										CurPostext = CurPos, 
-										length = length, 
-										route = route, 
-										lat=CurPos_location.latitude, 
+				return render_template('search.html',
+										Destinationtext = Destination,
+										CurPostext = CurPos,
+										length = length,
+										route = route,
+										lat=CurPos_location.latitude,
 										lon=CurPos_location.longitude)
 		else:
 			flash(error);
 	return render_template('search.html', **default_params)
-
-
-def get_route(CurPos_latitude, CurPos_longtitude, Des_latitude, Des_longtitude):
-	#check databese
-	route = [[CurPos_latitude, CurPos_longtitude,50],[37.772,-122.214,40],[-27.467,153.027,10], [Des_latitude, Des_longtitude,80]]
-	return route

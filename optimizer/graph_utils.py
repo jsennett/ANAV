@@ -103,9 +103,7 @@ class Graph:
 
                 for (udist, ucost, u) in sorted_neighbors:
                     ####### may not be corrected one
-                    print("#############")
-                    print('(udist, ucost, u):', udist, ucost, u)
-                    print("#############")
+
                     if u == B:
                         if debug: print("paths searched:", onsidered)
                         # TODO: make sure this is returning at the right time.
@@ -116,6 +114,7 @@ class Graph:
                         print(formatted_path)
 
                         return formatted_path
+
                     if u in visited: continue
                     prev_cost = self.cost.get(u)
                     next_cost = vcost + ucost
