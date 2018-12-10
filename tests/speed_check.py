@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 from data.database_utils import edges_within_radius, nearest_node
 from data.config import credentials
-from optimizer.graph_utils import optimize, dist_2d
+from optimizer.graph_utils import optimize, midpoint, search_radius
 
 import time
 
@@ -82,27 +82,29 @@ def time_nearest_node_not_found():
 
 def time_optimize():
 
-    # Random, valid preferences
-    preferences = (10, 20, 30, 40, 50, 60)
+    # Defualt, valid preferences
+    preferences = (50, 50, 50, 50, 50, 50)
 
-    A = (42.38, -72.52)
+    A = (42.3416991, -71.1004189)
     for meter_shift in [500, 1000, 2000, 5000, 10000, 25000, 50000]:
 
         # Set point B to various distances away from A
         degree_shift = meter_shift / 111000.0
-        B = (A[0] + degree_shift, A[1] + degree_shift)
-        AB_dist = dist_2d(A, B)
+        B = (A[0] + degree_shift, A[1] - degree_shift)
+        dist = search_radius(A, B)
+        m = midpoint(A, B)
+        edges = edges_within_radius(credentials, radius=dist, lat=m[0], lon=m[1], limit=5000000)
 
         start = time.time()
         optimize(A, B, preferences)
         end = time.time()
-        print("Optimization for distance %f complete in %f sec" % (AB_dist, end - start))
+        print("Optimization for distance %f & edges %i complete in %f sec" % (dist, len(edges), end - start))
 
 
 if __name__ == '__main__':
 
     # time_radius_queries()
     # time_nearest_node_queries()
-    # time_optimize()
+    time_optimize()
     # time_nearest_node_not_found()
-    time_random_nearest_nodes()
+    # time_random_nearest_nodes()

@@ -1,54 +1,39 @@
 from cost_utils import *
 
 
-def test_cost(A, B):
-    return cost(A, B)
+def test_cost(distance, highway, bicycle, incline, preferences):
+    return cost()
 
-def test_all(A, B):
-    print("cost", cost(A, B))
-    print("incline_multiplier", incline_multiplier(incline(A, B)))
+def display_bike():
+    array = [0, 0.5, 1]
+    for pref in array:
+        print("mutiplier", 1+bike_multiplier('Yes', pref))
 
 def display_incline_multipliers():
     for incline in range(-45, 45):
         print(str(incline) + "%:", incline_multiplier(incline))
 
+def display_road_multiplier():
+    arr1 = ["cycleway", "tertiary", "residential", "service", "motorway", "primary", "secondary", "other"]
+    arr2 = [0, .5 ,1]
+    for way in arr1:
+        for pref in arr2:
+            muli = road_multiplier(way, pref, pref, pref, pref)
+            print(way, pref, ": ", 1+muli)
+
+def disp_cost():
+    arr1 = ["cycleway", "tertiary", "residential", "service", "motorway", "primary", "secondary", "other"]
+    arr2 = [0, .5 ,1]
+    for incl in range(-10, 21):
+        for way in arr1:
+            for pref in arr2:
+                c = cost(100, way, 'No', incl, (pref, pref, pref, pref, pref, pref))
+                print(way, pref, incl, ": ", c)
+
 
 if __name__ == '__main__':
+    #display_bike()
+    #display_incline_multipliers()
+    #display_road_multiplier()
+    disp_cost()
 
-    A = {'lat': 42.3489178,
-         'lon': -72.5686607,
-         'elev': 150}
-
-    B = {'lat':42.3489313,
-         'lon': -72.5679691,
-         'elev': 175}
-
-    C = {'lat':42.3489313,
-         'lon': -72.5679691,
-         'elev': 152}
-
-    D = {'lat':42.3489313,
-         'lon': -72.5679691,
-         'elev': 150}
-"""
-    print("*" * 80)
-    print("Two points on a very steep uphill: ")
-    test_all(A, B)
-
-
-    print("*" * 80)
-    print("Two points on a very slight uphill: ")
-    test_all(A, C)
-
-    print("*" * 80)
-    print("Two points on a very slight downhill: ")
-    test_all(C, A)
-
-    print("*" * 80)
-    print("Two points on a flat: ")
-    test_all(A, D)
-
-    print("*" * 80)
-
-    display_incline_multipliers()
-"""
