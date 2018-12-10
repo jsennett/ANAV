@@ -196,43 +196,43 @@
           <a><b>Flatness Select:</b></a>
           <div class = "rowPow">
             <label>No Preference
-              <input type="radio" name="group1">
+              <input type="radio" name="group1" value='0'>
               <span class="checkmark"></span>
             </label>
 
             <label>More Flat
-              <input type="radio" name="group1">
+              <input type="radio" name="group1" value='0.5' checked="checked">
               <span class="checkmark"></span>
             </label>
 
             <label>Most Flat
-              <input type="radio" name="group1">
+              <input type="radio" name="group1" value='1'>
               <span class="checkmark"></span>
             </label>
           </div>
         </fieldset>
 
           <!-- Old Flat Slider Code! -->
-          <fieldset>
-          <!-- DELETE ME -->
-          <a>Flatness:</a><input id="flatness_range" max="100" min="0" name="flatness_range" onchange= "flatness_val.value=this.value" step="5" type="range"> <output for="flatness_range" id="flatness_val">50</output>
-          </fieldset>
+
+          <!-- DELETE ME 
+          <a>Flatness:</a><input id="flatness_range" max="100" min="0" name="flatness_range" onchange= "flatness_val.value=this.value" step="5" type="range"> <output for="flatness_range" id="flatness_val">50</output> -->
+
           
         <fieldset id ="group2">
           <a><b>Bike Lane Preference:</b></a>
           <div class = "rowPow">
             <label>No Preference
-              <input type="radio" name="group2">
+              <input type="radio" name="group2" value='0'>
               <span class="checkmark"></span>
             </label>
 
             <label>Prefer Lanes
-              <input type="radio" name="group2">
+              <input type="radio" name="group2" value='0.5' checked="checked">
               <span class="checkmark"></span>
             </label>
 
             <label>Prioritize Lanes
-              <input type="radio" name="group2">
+              <input type="radio" name="group2" value='1'>
               <span class="checkmark"></span>
             </label>
           </div>
@@ -240,10 +240,8 @@
 
           <!-- Old Bike Designation Slider! -->
 
-          <!-- REMOVE ME -->
-          <fieldset>
-          <a>Bicycle Designation:</a> <input id="bicycle_range" max="100" min="0" name="bicycle_range" onchange="bicycle_val.value=this.value" step="5" type="range"> <output for="bicycle_range" id="bicycle_val">50</output><br>
-        </fieldset>
+          <!-- REMOVE ME
+          <a>Bicycle Designation:</a> <input id="bicycle_range" max="100" min="0" name="bicycle_range" onchange="bicycle_val.value=this.value" step="5" type="range"> <output for="bicycle_range" id="bicycle_val">50</output><br>  -->
         
 
           <!-- REMOVE ME 
@@ -260,76 +258,73 @@
           <a><b>Motorway Preference:</b></a>
           <div class = "rowPow">
             <label>No Preference
-              <input type="radio" name="group3">
+              <input type="radio" name="group3" value='0'>
               <span class="checkmark"></span>
             </label>
 
             <label>Prefer Motorways
-              <input type="radio" name="group3">
+              <input type="radio" name="group3" value='0.5' checked="checked">
               <span class="checkmark"></span>
             </label>
 
             <label>Prioritize Motorways
-              <input type="radio" name="group3">
+              <input type="radio" name="group3" value='1'>
               <span class="checkmark"></span>
             </label>
           </div>
         </fieldset>
-          <!-- REMOVE ME -->
-        <fieldset>
-          <a>Motorway:</a><input id="motorway_range" max="100" min="0" name="motorway_range" onchange="motorway_val.value=this.value" step="5" type="range"> <output for="motorway_range" id="motorway_val">50</output><br>
-        </fieldset>
+
+          <!-- REMOVE ME
+          <a>Motorway:</a><input id="motorway_range" max="100" min="0" name="motorway_range" onchange="motorway_val.value=this.value" step="5" type="range"> <output for="motorway_range" id="motorway_val">50</output><br>  -->
 
         <fieldset id = "group4">
           <a><b>Highway Preference:</b></a>
           <div class = "rowPow">
             <label>No Preference
-              <input type="radio" name="group4">
+              <input type="radio" name="group4" value='0'>
               <span class="checkmark"></span>
             </label>
 
             <label>Prefer Highways
-              <input type="radio" name="group4">
+              <input type="radio" name="group4" value='0.5' checked="checked">
               <span class="checkmark"></span>
             </label>
 
             <label>Prioritize Highways
-              <input type="radio" name="group4">
+              <input type="radio" name="group4" value='1'>
               <span class="checkmark"></span>
             </label>
           </div>
         </fieldset>
-          <!-- REMOVE ME -->
-        <fieldset>
-          <a>Primary Highway:</a> <input id="highway_range" max="100" min="0" name="highway_range" onchange="highway_val.value=this.value" step="5" type="range"> <output for="highway_range" id="highway_val">50</output><br>
-          </fieldset>
+
+          <!-- REMOVE ME 
+          <a>Primary Highway:</a> <input id="highway_range" max="100" min="0" name="highway_range" onchange="highway_val.value=this.value" step="5" type="range"> <output for="highway_range" id="highway_val">50</output><br> -->
+
 
 
           <fieldset id = "group5">
           <a><b>Residential Road Preference:</b></a>
           <div class = "rowPow">
             <label>No Preference
-              <input type="radio" name="group5">
+              <input type="radio" name="group5" value='0'>
               <span class="checkmark"></span>
             </label>
 
             <label>Prefer Residential
-              <input type="radio" name="group5">
+              <input type="radio" name="group5" value='0.5' checked="checked">
               <span class="checkmark"></span>
             </label>
 
             <label>Prioritize Residential
-              <input type="radio" name="group5">
+              <input type="radio" name="group5" value='1'>
               <span class="checkmark"></span>
             </label>
           </div>
         </fieldset>
 
-          <!-- REMOVE ME -->
-          <fieldset>
-          <a>Residential Roads:</a> <input id="residential_range" max="100" min="0" name="residential_range" onchange="residential_val.value=this.value" step="5" type="range"> <output for="residential_range" id="residential_val">50</output><br>
-        </fieldset>
-        
+          <!-- REMOVE ME 
+          <a>Residential Roads:</a> <input id="residential_range" max="100" min="0" name="residential_range" onchange="residential_val.value=this.value" step="5" type="range"> <output for="residential_range" id="residential_val">50</output><br> -->
+         
         </fieldset>
         </form>
       </div>
