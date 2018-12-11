@@ -104,95 +104,96 @@ def flag_irrelevant_nodes(credentials):
         conn.close()
         print("connection closed.")
 
-        def sample_table(credentials, table='nodes', columns='*', limit=10, filter=''):
-            """ Get some rows from a table; useful for exploring and debugging. """
-            # Connect
-            conn = psycopg2.connect(credentials)
-            c = conn.cursor()
 
-            # Query
-            rows = []
-            sql = "SELECT %s FROM %s %s LIMIT %s"
-            input = (columns, table, filter, limit)
+def sample_table(credentials, table='nodes', columns='*', limit=10, filter=''):
+    """ Get some rows from a table; useful for exploring and debugging. """
+    # Connect
+    conn = psycopg2.connect(credentials)
+    c = conn.cursor()
 
-            try:
-                c.execute(sql, input)
-                rows = c.fetchall()
-            finally:
-                c.close()
-                conn.close()
+    # Query
+    rows = []
+    sql = "SELECT %s FROM %s %s LIMIT %s"
+    input = (columns, table, filter, limit)
 
-            return rows
+    try:
+        c.execute(sql, input)
+        rows = c.fetchall()
+    finally:
+        c.close()
+        conn.close()
 
-
-        def count_rows(table, credentials, filter=''):
-            """ Count rows in a table; useful for exploring and debugging. """
-            # Connect
-            conn = psycopg2.connect(**credentials)
-            c = conn.cursor()
-
-            # Query
-            c.execute("SELECT COUNT(1) FROM %s %s" % (table, filter))
-            count = c.fetchone()
-
-            # Close
-            c.close()
-            conn.close()
-            return count
+    return rows
 
 
-        def update_elevation(credentials, api_key, debug=False):
+def count_rows(table, credentials, filter=''):
+    """ Count rows in a table; useful for exploring and debugging. """
+    # Connect
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
 
-            url_head = 'https://maps.googleapis.com/maps/api/elevation/json?locations='
-            url_tail = "&key=" + api_key
+    # Query
+    c.execute("SELECT COUNT(1) FROM %s %s" % (table, filter))
+    count = c.fetchone()
 
-            # Get nodes from database
-            conn = psycopg2.connect(**credentials)
-            c = conn.cursor()
-            batch_size = 300
+    # Close
+    c.close()
+    conn.close()
+    return count
 
-            intervals = range(1000, 10000)
-            # intervals = range(10000, 14223)
-            # offsets = [0, batch_size, 2*batch_size]
-            for interval in intervals:
 
-                # Select a batch of rows
-                batch_ns = (batch_size * interval, batch_size * (interval + 1))
-                sql = "SELECT n, lat, lon FROM nodes WHERE n > %s AND n <= %s"
-                c.execute(sql, (batch_ns))
-                rows = c.fetchall()
+def update_elevation(credentials, api_key, debug=False):
 
-                # Once we reach the end of the table, we won't have any rows left.
-                if len(rows) == 0:
-                    break
+    url_head = 'https://maps.googleapis.com/maps/api/elevation/json?locations='
+    url_tail = "&key=" + api_key
 
-                if debug:
-                    print('First row in batch:', rows[0])
-                    print('Last row in batch:', rows[-1])
-                    print('Rows fetched from database:', len(rows))
+    # Get nodes from database
+    conn = psycopg2.connect(**credentials)
+    c = conn.cursor()
+    batch_size = 300
 
-                # get elevation data for these rows
-                url_middle = '|'.join([str(row[1]) + ',' + str(row[2]) for row in rows])
-                query = url_head + url_middle + url_tail
-                assert(len(query) < 8192)
-                response = simplejson.load(urllib.request.urlopen(query))
+    intervals = range(0, 14233) # intervals of 300 row batches 
+    for interval in intervals:
 
-                if debug:
-                    print("status:", response.get('status'))
-                    print('number of elevations found:', len(response.get('results')))
+        # Select a batch of rows
+        batch_ns = (batch_size * interval, batch_size * (interval + 1))
+        sql = "SELECT n, lat, lon FROM nodes WHERE n > %s AND n <= %s"
+        c.execute(sql, (batch_ns))
+        rows = c.fetchall()
 
-                assert(response.get('status') == 'OK')
-                assert(len(response.get('results', [])) == len(rows))
+        # Once we reach the end of the table, we won't have any rows left.
+        if len(rows) == 0:
+            break
 
-                # Combine id with elevation
-                ns = [row[0] for row in rows]
-                elevations = [row['elevation'] for row in response['results']]
-                ns_to_elevations = list(zip(ns, elevations))
+        if debug:
+            print('First row in batch:', rows[0])
+            print('Last row in batch:', rows[-1])
+            print('Rows fetched from database:', len(rows))
 
-                sql_insert = "INSERT INTO elevation (n, elevation) VALUES %s"
-                execute_values(c, sql_insert, ns_to_elevations)
-                conn.commit()
-                print("********** Nodes updated with elevation", batch_ns, "**********")
+        # get elevation data for these rows
+        url_middle = '|'.join([str(row[1]) + ',' + str(row[2]) for row in rows])
+        query = url_head + url_middle + url_tail
 
-            c.close()
-            conn.close()
+        # Google API requires queries of length < 8192
+        assert(len(query) < 8192) 
+        response = simplejson.load(urllib.request.urlopen(query))
+
+        if debug:
+            print("status:", response.get('status'))
+            print('number of elevations found:', len(response.get('results')))
+
+        assert(response.get('status') == 'OK')
+        assert(len(response.get('results', [])) == len(rows))
+
+        # Combine id with elevation
+        ns = [row[0] for row in rows]
+        elevations = [row['elevation'] for row in response['results']]
+        ns_to_elevations = list(zip(ns, elevations))
+
+        sql_insert = "INSERT INTO elevation (n, elevation) VALUES %s"
+        execute_values(c, sql_insert, ns_to_elevations)
+        conn.commit()
+        print("********** Nodes updated with elevation", batch_ns, "**********")
+
+    c.close()
+    conn.close()

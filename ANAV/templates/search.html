@@ -2,16 +2,12 @@
 <html>
 <head>
   <meta content="initial-scale=1.0, user-scalable=no" name="viewport">
-  <link href="static/style.css" rel="stylesheet">
   <meta charset="utf-8">
   <title>ANAV</title>
   <style>
-       /* Always set the map height explicitly to define the size of the div
-        * element that contains the map. */
      #map {
        height: 100%;
      }
-     /* Optional: Makes the sample page fill the window. */
      html, body {
        height: 100%;
        margin: 0;
@@ -75,7 +71,6 @@
            overflow: hidden;
            padding: 0 .625em;
      }
-
 
      .DeSet {
        margin-left: 5px;
@@ -210,14 +205,7 @@
               <span class="checkmark"></span>
             </label>
           </div>
-        </fieldset>
-
-          <!-- Old Flat Slider Code! -->
-
-          <!-- DELETE ME 
-          <a>Flatness:</a><input id="flatness_range" max="100" min="0" name="flatness_range" onchange= "flatness_val.value=this.value" step="5" type="range"> <output for="flatness_range" id="flatness_val">50</output> -->
-
-          
+        </fieldset>          
         <fieldset id ="group2">
           <a><b>Bike Lane Preference:</b></a>
           <div class = "rowPow">
@@ -236,18 +224,6 @@
               <span class="checkmark"></span>
             </label>
           </div>
-        </fieldset>
-
-          <!-- Old Bike Designation Slider! -->
-
-          <!-- REMOVE ME
-          <a>Bicycle Designation:</a> <input id="bicycle_range" max="100" min="0" name="bicycle_range" onchange="bicycle_val.value=this.value" step="5" type="range"> <output for="bicycle_range" id="bicycle_val">50</output><br>  -->
-        
-
-          <!-- REMOVE ME 
-          <a>Short Distance:</a> <input id="distance_range" max="100" min="0" name="distance_range" onchange="distance_val.value=this.value" step="5" type="range"> <output for="distance_range" id="distance_val">50</output><br> -->
-
-
         </fieldset>
       </div>
     </div>
@@ -273,10 +249,6 @@
             </label>
           </div>
         </fieldset>
-
-          <!-- REMOVE ME
-          <a>Motorway:</a><input id="motorway_range" max="100" min="0" name="motorway_range" onchange="motorway_val.value=this.value" step="5" type="range"> <output for="motorway_range" id="motorway_val">50</output><br>  -->
-
         <fieldset id = "group4">
           <a><b>Highway Preference:</b></a>
           <div class = "rowPow">
@@ -296,12 +268,6 @@
             </label>
           </div>
         </fieldset>
-
-          <!-- REMOVE ME 
-          <a>Primary Highway:</a> <input id="highway_range" max="100" min="0" name="highway_range" onchange="highway_val.value=this.value" step="5" type="range"> <output for="highway_range" id="highway_val">50</output><br> -->
-
-
-
           <fieldset id = "group5">
           <a><b>Residential Road Preference:</b></a>
           <div class = "rowPow">
@@ -321,10 +287,6 @@
             </label>
           </div>
         </fieldset>
-
-          <!-- REMOVE ME 
-          <a>Residential Roads:</a> <input id="residential_range" max="100" min="0" name="residential_range" onchange="residential_val.value=this.value" step="5" type="range"> <output for="residential_range" id="residential_val">50</output><br> -->
-         
         </fieldset>
         </form>
       </div>
@@ -391,12 +353,4 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-Kk-3VfS7utO30Z1_XsSOXRwT6g745NQ&libraries=places,drawing&callback=initMap" async defer>
 </script>
 </body>
-
-
-<ul>
-    <li><a class="active" href="index.html">Navigation</a></li>
-    <li><a href="about.html">About</a></li>
-</ul>
-
-
 </html>

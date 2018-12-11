@@ -27,14 +27,7 @@ def search():
 		CurPos = request.form['CurPos']
 		Destination = request.form['Destination']
 
-		#flatness_val = float(request.form['flatness_range'])/100
-		#bicycle_val = float(request.form['bicycle_range'])/100
 		distance_val = 1
-		
-		#motorway_val = float(request.form['motorway_range'])/100
-		#highway_val = float(request.form['highway_range'])/100
-		#residential_val = float(request.form['residential_range'])/100
-
 		flatness_val = float(request.values.get('group1'))
 		bicycle_val = float(request.values.get('group2'))
 		motorway_val = float(request.values.get('group3'))
@@ -95,5 +88,6 @@ def search():
 										lat=CurPos_location.latitude,
 										lon=CurPos_location.longitude)
 		else:
-			flash(error);
+			flash(error)
+			
 	return render_template('search.html', **default_params)

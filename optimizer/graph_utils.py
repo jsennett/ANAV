@@ -72,7 +72,6 @@ class Graph:
                 # we have not fully explored all of the remaining neighbors.
                 if use_a_star and v == B:
                     final_path = [(self.adjacencyList[nodeid][0:2]) for nodeid in path]
-                    print(final_path)
                     return final_path
 
                 if debug: print('v in adjlist:', self.adjacencyList.get(v))
@@ -94,38 +93,32 @@ class Graph:
                                       in zip(distances, neighbors)]
                 neighbor_distances.sort()
                 sorted_neighbors = neighbor_distances
-                if debug: print("sorted_neighbors" ,sorted_neighbors)
-
-                if use_a_star:
-                    if debug: print("checking sorted neighbors:", sorted_neighbors)
-                else:
-                    if debug: print("checking unsorted neighbors:", sorted_neighbors)
 
                 for (udist, ucost, u) in sorted_neighbors:
                     ####### may not be corrected one
 
                     if u == B:
                         if debug: print("paths searched:", onsidered)
-                        # TODO: make sure this is returning at the right time.
                         path = path + [B]
                         print("Shortest path found!")
-                        # for p in path: print(p)
                         formatted_path = [(self.nodes[nodeid][0:2]) for nodeid in path]
-                        print(formatted_path)
 
                         return formatted_path
 
                     if u in visited: continue
                     prev_cost = self.cost.get(u)
                     next_cost = vcost + ucost
+
                     # Update cost, if taking this path is optimal
                     if next_cost < prev_cost:
                         self.cost[u] = next_cost
                         if debug: print((heap, (u, next_cost, path)))
-                        ###### only heappush if it is not in the heap
+
+                        # only heappush if it is not in the heap
                         if (prev_cost, u, path) not in heap:
                             heappush(heap, (next_cost, u, path))
 
+        # If the heap is empty and no route found, return empty set
         print("No path found.")
         return []
 
@@ -201,7 +194,7 @@ def optimize(A, B, preferences, debug=False):
         #print("sample edges:", edges_to_search[:10])
         print("preferences:", preferences)
 
-    # TODO: build the graph g, call g.dijkstra_path, and return the shortest path
+    # Build the graph, call algorithm, and return the shortest path
     g = Graph()
 
     for way in edges_to_search:
@@ -223,13 +216,7 @@ def optimize(A, B, preferences, debug=False):
 
     shortest_path = g.dijkstra_path(s_id, t_id)
 
-    if debug:
-        print("shortest_path found:")
-        print(shortest_path)
-
     return shortest_path
-
-
 
 
 def midpoint(s, t):

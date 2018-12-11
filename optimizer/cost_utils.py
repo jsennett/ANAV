@@ -20,6 +20,7 @@ def cost(distance, highway, bicycle, incline, preferences):
         cost = 0.01
     return cost
 
+
 def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
                        damp=.01, exp_damp=.05):
     """
@@ -29,7 +30,6 @@ def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
     This represents all downhills being "rests".
     The default parameters give pretty good approximations of "effort".
     """
-    # default should be 0
     # Apply caps
     if incline > hard_cap:
         return incline_multiplier(hard_cap, hard_cap=hard_cap)
@@ -43,17 +43,17 @@ def incline_multiplier(incline, hard_cap=20, neg_cap=-10,
     else:
         return damp * (incline + 1)**3 + 1 - damp
 
+
 def bike_multiplier(bikelane, bicycle_pref):
-    #default = 0
+    """ Return a multiplier based on presence of a bike lane """
     result = bicycle_pref * 0.8
     if bikelane=='Yes':
         return -result
     return 0.0
 
+
 def road_multiplier(highway, bicycle_pref, motorway_pref, highway_pref, residential_pref):
-    """
-    default 0
-    """
+    """ Return a multiplier based on road type """
     if highway == 'motorway':
         result = -motorway_pref*0.5
     elif highway == 'primary':

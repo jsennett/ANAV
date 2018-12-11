@@ -101,11 +101,3 @@ def time_optimize():
         end = time.time()
         print("Optimization complete in %f sec" % (end - start))
 
-
-if __name__ == '__main__':
-
-    # time_radius_queries()
-    # time_nearest_node_queries()
-    time_optimize()
-    # time_nearest_node_not_found()
-    # time_random_nearest_nodes()
