@@ -14,7 +14,7 @@ def cost(distance, highway, bicycle, incline, preferences):
     multiplier = 1 + bike_multiplier(bicycle, bicycle_pref) + road_multiplier(highway, bicycle_pref, motorway_pref, highway_pref, residential_pref)
     if multiplier <= 0:
         multiplier = 0.01
-    incl = incline_multiplier(float(incline))*(flatness_pref-0.5)
+    incl = incline_multiplier(float(incline))*flatness_pref
     cost = float(distance) * multiplier + incl
     if cost <= 0:
         cost = 0.01

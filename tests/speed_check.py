@@ -83,22 +83,23 @@ def time_nearest_node_not_found():
 def time_optimize():
 
     # Defualt, valid preferences
-    preferences = (50, 50, 50, 50, 50, 50)
+    preferences = (0, 0, 0, 0, 0, 0)
 
-    A = (42.3416991, -71.1004189)
-    for meter_shift in [500, 1000, 2000, 5000, 10000, 25000, 50000]:
-
-        # Set point B to various distances away from A
-        degree_shift = meter_shift / 111000.0
-        B = (A[0] + degree_shift, A[1] - degree_shift)
-        dist = search_radius(A, B)
-        m = midpoint(A, B)
-        edges = edges_within_radius(credentials, radius=dist, lat=m[0], lon=m[1], limit=5000000)
-
+    A = (42.3600949, -71.0963487)
+    B = (42.3632679, -71.1061316)
+    Art_museum = (42.3355989, -71.1013107)
+    Exhibition_Center = (42.3471625,-71.0881894)
+    Airport = (42.3673204,-71.024456) #no path found
+    South_bay_center = (42.3313662,-71.0783914)
+    JFK_lib_mus = (42.3088871,-71.0889916)
+    havard = (42.3698432,-71.0983546)
+    TF_University = (42.3756961,-71.1122189)
+    points = [TF_University]
+    for dest in points:
         start = time.time()
-        optimize(A, B, preferences)
+        optimize(A, dest, preferences)
         end = time.time()
-        print("Optimization for distance %f & edges %i complete in %f sec" % (dist, len(edges), end - start))
+        print("Optimization complete in %f sec" % (end - start))
 
 
 if __name__ == '__main__':
