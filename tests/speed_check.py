@@ -3,7 +3,7 @@ import sys
 sys.path.append('../')
 from data.database_utils import edges_within_radius, nearest_node
 from data.config import credentials
-from optimizer.graph_utils import optimize, dist_2d
+from optimizer.graph_utils import optimize, midpoint, search_radius
 
 import time
 
@@ -82,27 +82,30 @@ def time_nearest_node_not_found():
 
 def time_optimize():
 
-    # Random, valid preferences
-    preferences = (10, 20, 30, 40, 50, 60)
+    # Defualt, valid preferences
+    preferences = (0, 0, 0, 0, 0, 0)
 
-    A = (42.38, -72.52)
-    for meter_shift in [500, 1000, 2000, 5000, 10000, 25000, 50000]:
-
-        # Set point B to various distances away from A
-        degree_shift = meter_shift / 111000.0
-        B = (A[0] + degree_shift, A[1] + degree_shift)
-        AB_dist = dist_2d(A, B)
-
+    A = (42.3600949, -71.0963487)
+    B = (42.3632679, -71.1061316)
+    Art_museum = (42.3355989, -71.1013107)
+    Exhibition_Center = (42.3471625,-71.0881894)
+    Airport = (42.3673204,-71.024456) #no path found
+    South_bay_center = (42.3313662,-71.0783914)
+    JFK_lib_mus = (42.3088871,-71.0889916)
+    havard = (42.3698432,-71.0983546)
+    TF_University = (42.3756961,-71.1122189)
+    points = [TF_University]
+    for dest in points:
         start = time.time()
-        optimize(A, B, preferences)
+        optimize(A, dest, preferences)
         end = time.time()
-        print("Optimization for distance %f complete in %f sec" % (AB_dist, end - start))
+        print("Optimization complete in %f sec" % (end - start))
 
 
 if __name__ == '__main__':
 
     # time_radius_queries()
     # time_nearest_node_queries()
-    # time_optimize()
+    time_optimize()
     # time_nearest_node_not_found()
-    time_random_nearest_nodes()
+    # time_random_nearest_nodes()
