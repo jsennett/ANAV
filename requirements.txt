@@ -4,7 +4,7 @@ geographiclib==1.49
 geopy==1.18.0
 heapdict==1.0.0
 Jinja2==2.10
-lxml==4.2.5
+lxml==4.6.2
 OSMPythonTools==0.2.4
 pep8==1.7.1
 psycopg2-binary==2.7.6.1
