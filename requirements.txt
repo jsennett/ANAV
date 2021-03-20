@@ -3,7 +3,7 @@ Flask-Cors==3.0.6
 geographiclib==1.49
 geopy==1.18.0
 heapdict==1.0.0
-Jinja2==2.10
+Jinja2==2.11.3
 lxml==4.2.5
 OSMPythonTools==0.2.4
 pep8==1.7.1
